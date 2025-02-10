@@ -1,51 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "../Include/module.h"
 
-char *slice(const char *str, int start, int end)
-{
-    if (str == NULL)
-        return NULL;
-    int len = strlen(str);
-    if (start < 0)
-        start = len + start;
-    if (end <= 0)
-        end = len + end;
-    if (start >= len || start >= end)
-        return NULL;
-    if (end > len)
-        end = len;
-    if (start < 0)
-        start = 0;
-    int slice_len = end - start;
-    char *result = (char *)malloc(slice_len + 1);
-    if (!result)
-        return NULL;
-    strncpy(result, str + start, slice_len);
-    result[slice_len] = '\0';
-    return result;
-}
-
-twostring split(const char *inp, char delim)
-{
-    twostring s;
-    int i = 0;
-    while (inp[i] != delim && inp[i] != '\0')
-    {
-        s.str1[i] = inp[i];
-        i++;
-    }
-    s.str1[i] = '\0';
-    if (inp[i] == delim)
-        strcpy(s.str2, &inp[i + 1]);
-    else
-        s.str2[0] = '\0';
-    return s;
-}
-
-int is_valid_cell(const char *str)
-{
+//checks if the cell is valid 
+int is_valid_cell(const char *str) {
     int len = strlen(str);
     if (len < 2 || len > 6)
         return 0;
@@ -61,218 +21,249 @@ int is_valid_cell(const char *str)
     return i == len;
 }
 
-commandCall parse(const char *inp)
-{
-    char cell[100], expr[100];
-    char error[100] = "";
-    const char *commands[] = {"exit", "w", "a", "s", "d", "disable_output", "enable_output"};
-    const char *cmds[] = {"exit", "up", "left", "down", "right", "disable_output", "enable_output"};
-    for (int i = 0; i < 7; i++)
-    {
-        if (strcmp(inp, commands[i]) == 0)
-        {
-            commandCall retVal;
-            strcpy(retVal.cmd, cmds[i]);
-            strcpy(retVal.param1, "");
-            strcpy(retVal.param2, "");
-            strcpy(retVal.error, "");
-            return retVal;
+//checks if the value is valid (number in string form)
+int is_valid_val(char *str) {
+    while (*str) {
+        if (!isdigit(*str)) return 0;
+        str++;
+    }
+    return 1;
+}
+
+// parses the input and returns the commandCall structure
+commandCall parse(char *inp) {
+    commandCall cmd = {0}; 
+
+    // Handle simple commands
+    if(strcmp(inp,"disable_output")==0 || strcmp(inp,"enable_output")==0|| strcmp(inp,"w")==0||strcmp(inp,"d")==0||strcmp(inp,"a")==0||strcmp(inp,"s")==0){
+        strcpy(cmd.type,"cmd");
+        strcpy(cmd.cmd,inp);
+
+    }
+    else if(sscanf(inp,"scroll_to %s",cmd.param1)==1){
+        strcpy(cmd.type,"cmd");
+        strcpy(cmd.cmd,"scroll_to");
+        if (is_valid_cell(cmd.param1)){
+            strcpy(cmd.type1,"cell");
+        }
+        else{
+            strcpy(cmd.error,"Invalid cell");
         }
     }
-    if (strncmp("scroll_to ", inp, strlen("scroll_to ")) == 0)
-    {
-        char *cell = slice(inp, strlen("scroll_to "), strlen(inp));
-        commandCall retVal;
-        strcpy(retVal.cmd, "scroll_to");
-        strcpy(retVal.param1, cell);
-        strcpy(retVal.param2, "");
-        strcpy(retVal.error, "");
-        return retVal;
-    }
+    // Handle function commands
+    else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", cmd.target, cmd.cmd, cmd.param1, cmd.param2) == 4) { 
+         if (strcmp(cmd.cmd, "MAX") == 0 || strcmp(cmd.cmd, "MIN") == 0 ||
+                   strcmp(cmd.cmd, "SUM") == 0 || strcmp(cmd.cmd, "AVG") == 0 ||
+                   strcmp(cmd.cmd, "STDEV") == 0) {
+            strcpy(cmd.type, "func");
+                if (is_valid_val(cmd.param1)) {
+                strcpy(cmd.type1, "val"); 
+            } else if (is_valid_cell(cmd.param1)) {
+                strcpy(cmd.type1, "cell");
+            } else {
+                strcpy(cmd.error, "Invalid param1");
+                return cmd;
+            }
 
-    twostring s = split(inp, '=');
-    strcpy(cell, s.str1);
-    strcpy(expr, s.str2);
-    printf("Cell: %s\n", cell);
-    printf("Expression: %s\n", expr);
-    if (strcmp("", expr) == 0 || strcmp("", cell) == 0)
-        strcpy(error, "Invalid expression");
-    else
-    {
-        int ln = (strlen(expr) >= 7) ? 7 : strlen(expr);
-        for (int i = 0; i < ln; i++)
-        {
-            if (expr[i] == '+' || expr[i] == '-' || expr[i] == '*' || expr[i] == '/')
-            {
-                char cmd[100];
-                switch (expr[i])
-                {
+            if (is_valid_val(cmd.param2)) {
+                strcpy(cmd.type2, "val");
+            } else if (is_valid_cell(cmd.param2)) {
+                strcpy(cmd.type2, "cell");
+            } else {
+                strcpy(cmd.error, "Invalid param2");
+                return cmd;
+            }
+
+            if(strcmp(cmd.type1,cmd.type2)!=0){
+                strcpy(cmd.error, "param1 and param2 type dont match");
+                return cmd;
+            }
+            
+        } else {
+            strcpy(cmd.error, "Unknown command");
+        }
+    } else if(sscanf(inp,"SLEEP(%s)",cmd.param1)==1){
+        strcpy(cmd.type,"func");
+        strcpy(cmd.cmd,"SLEEP");
+        if (is_valid_val(cmd.param1)){
+            strcpy(cmd.type1,"val");
+        }
+        else{
+            strcpy(cmd.error,"Invalid param1");
+        }
+
+    } 
+    // Handle arithmetic commands
+    else if(sscanf(inp, "%[^=]=%[^+-*/]%[+-*/]%s", cmd.target, cmd.param1,cmd.cmd, cmd.param2) == 4){
+            strcpy(cmd.type, "art");
+            
+            switch (cmd.cmd[0]) {
                 case '+':
-                    strcpy(cmd, "add");
+                    strcpy(cmd.cmd, "add");
                     break;
                 case '-':
-                    strcpy(cmd, "sub");
+                    strcpy(cmd.cmd, "sub");
                     break;
                 case '*':
-                    strcpy(cmd, "mul");
+                    strcpy(cmd.cmd, "mul");
                     break;
                 case '/':
-                    strcpy(cmd, "div");
+                    strcpy(cmd.cmd, "div");
                     break;
+            }
 
-                default:
-                    break;
-                }
-                twostring splitted = split(expr, expr[i]);
-                commandCall retVal;
-                strcpy(retVal.cmd, cmd);
-                strcpy(retVal.param1, splitted.str1);
-                strcpy(retVal.param2, splitted.str2);
-                return retVal;
+            if (is_valid_val(cmd.param1)) {
+                strcpy(cmd.type1, "val"); 
+            } else if (is_valid_cell(cmd.param1)) {
+                strcpy(cmd.type1, "cell");
+            } else {
+                strcpy(cmd.error, "Invalid param1");
+                return cmd;
             }
-            else if (expr[i] == '(')
-            {
-                char *sliced1 = slice(expr, 0, i);
-                char *sliced2 = slice(expr, i + 1, strlen(expr) - 1);
-                twostring splitted = split(sliced2, ':');
-                if (strcmp(sliced1, "SLEEP") == 0 && strcmp("", splitted.str2) != 0)
-                {
-                    strcpy(error, "Invalid expression");
-                }
-                else if (strcmp(sliced1, "MIN") == 0 || strcmp(sliced1, "MAX") == 0 || strcmp(sliced1, "AVG") == 0 || strcmp(sliced1, "SUM") == 0 || strcmp(sliced1, "STDEV") == 0)
-                {
-                    commandCall retVal;
-                    strcpy(retVal.cmd, sliced1);
-                    strcpy(retVal.param1, splitted.str1);
-                    strcpy(retVal.param2, splitted.str2);
-                    free(sliced1);
-                    free(sliced2);
-                    return retVal;
-                }
-                else
-                    strcpy(error, "Invalid expression");
+
+            if (is_valid_val(cmd.param2)) {
+                strcpy(cmd.type2, "val");
+            } else if (is_valid_cell(cmd.param2)) {
+                strcpy(cmd.type2, "cell");
+            } else {
+                strcpy(cmd.error, "Invalid param2");
+                return cmd;
+            } 
+            
             }
+    // Handle simple value/cell assignment
+    else if (sscanf(inp, "%[^=]=%s", cmd.target, cmd.param1) == 2) {
+        strcpy(cmd.type, "val");
+        strcpy(cmd.cmd, "set");
+
+        if (is_valid_val(cmd.param1)) {
+            strcpy(cmd.type1, "val");
+        } else if (is_valid_cell(cmd.param1)) {
+            strcpy(cmd.type1, "cell");
+        } else {
+            strcpy(cmd.error, "Invalid value or cell in param1");
         }
-        strcpy(error, "Invalid expression");
+    } else {
+        strcpy(cmd.error, "Invalid input format");
     }
-    commandCall emptyRetVal = {"", "", "", ""};
-    strcpy(emptyRetVal.error, error);
-    return emptyRetVal;
+
+    return cmd;
 }
 
-int addition(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+//operations
+int addition(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {
         return 0;
     }
-    return arr[x1][y1] + arr[x2][y2];
+    return arr[x1][y1].val + arr[x2][y2].val;
 }
-int subtraction(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+int subtraction(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {
         return 0;
     }
-    return arr[x1][y1] - arr[x2][y2];
+    return arr[x1][y1].val - arr[x2][y2].val;
 }
-int multiply(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+int multiply(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {
         return 0;
     }
-    return arr[x1][y1] * arr[x2][y2];
+    return arr[x1][y1].val * arr[x2][y2].val;
 }
-int maximum(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+int maximum(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {
         return 0;
     }
-    if (arr[x1][y1] >= arr[x2][y2])
+    if (arr[x1][y1].val >= arr[x2][y2].val)
     {
-        return arr[x1][y1];
+        return arr[x1][y1].val;
     }
     else
     {
-        return arr[x2][y2];
+        return arr[x2][y2].val;
     }
 }
-int maximumrange(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+int maximumrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
-    int max = arr[x1][y1];
+    int max = arr[x1][y1].val;
     for (int i = x1; i <= x2; i++)
     {
         for (int j = y1; j < y2; j++)
         {
-            if (max < arr[i][j])
+            if (max < arr[i][j].val)
             {
-                max = arr[i][j];
+                max = arr[i][j].val;
             }
         }
     }
     return max;
 }
-int minimumrange(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+int minimumrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
-    int min = arr[x1][y1];
+    int min = arr[x1][y1].val;
     for (int i = x1; i <= x2; i++)
     {
         for (int j = y1; j < y2; j++)
         {
-            if (min > arr[i][j])
+            if (min > arr[i][j].val)
             {
-                min = arr[i][j];
+                min = arr[i][j].val;
             }
         }
     }
     return min;
 }
-int sumrange(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+int sumrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
     int sum = 0;
     for (int i = x1; i <= x2; i++)
     {
         for (int j = y1; j < y2; j++)
         {
-            sum += arr[i][j];
+            sum += arr[i][j].val;
         }
     }
     return sum;
 }
-int avgrange(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+int avgrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
     int freq = (x2 - x1 + 1) * (y2 - y1 + 1);
-    return sum(x1, y1, x2, y2, row, col, arr) / freq;
+    return sumrange(x1, y1, x2, y2, row, col, arr) / freq;
 }
-int stdev(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+int stdev(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
-    int mean = avgrange(x1, y1, x2, y2, row, col, arr[row][col]);
+    int mean = avgrange(x1, y1, x2, y2, row, col, arr);
     int sum = 0;
     for (int i = x1; i <= x2; i++)
     {
         for (int j = y1; j < y2; j++)
         {
-            int diff = arr[i][j] - mean;
+            int diff = arr[i][j].val - mean;
             sum += (diff * diff);
         }
     }
     return sum;
 }
-int minimum(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+int minimum(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {
         return 0;
     }
-    if (arr[x1][y1] <= arr[x2][y2])
+    if (arr[x1][y1].val <= arr[x2][y2].val)
     {
-        return arr[x1][y1];
+        return arr[x1][y1].val;
     }
     else
     {
-        return arr[x2][y2];
+        return arr[x2][y2].val;
     }
 }
 int max(int a, int b)
@@ -291,7 +282,9 @@ int min(int a, int b)
     }
     return b;
 }
-void Display(int row, int col, int arr[row][col], char x, int rowi, int coli, int lastrow, int lastcol)
+
+// to display the 10*10 matrix
+void Display(int row, int col, cell arr[row][col], char x, int rowi, int coli, int lastrow, int lastcol)
 {
     if (rowi != -1 && coli != -1)
     {
@@ -299,7 +292,7 @@ void Display(int row, int col, int arr[row][col], char x, int rowi, int coli, in
         {
             for (int j = coli; j < coli + 10 && j < coli; j++)
             {
-                printf("%d ", arr[i][j]);
+                printf("%d ", arr[i][j].val);
             }
             printf("\n");
         }
@@ -314,7 +307,7 @@ void Display(int row, int col, int arr[row][col], char x, int rowi, int coli, in
             {
                 for (int j = top_left_col; j < top_left_col + 10 && j < col; j++)
                 {
-                    printf("%d ", arr[i][j]);
+                    printf("%d ", arr[i][j].val);
                 }
                 printf("\n");
             }
@@ -327,7 +320,7 @@ void Display(int row, int col, int arr[row][col], char x, int rowi, int coli, in
             {
                 for (int j = top_left_col; j <= top_left_col + 10 && j < col; j++)
                 {
-                    printf("%d ", arr[i][j]);
+                    printf("%d ", arr[i][j].val);
                 }
                 printf("\n");
             }
@@ -340,7 +333,7 @@ void Display(int row, int col, int arr[row][col], char x, int rowi, int coli, in
             {
                 for (int j = top_left_col; j <= top_left_col + 10 && j < col; j++)
                 {
-                    printf("%d ", arr[i][j]);
+                    printf("%d ", arr[i][j].val);
                 }
                 printf("\n");
             }
@@ -353,7 +346,7 @@ void Display(int row, int col, int arr[row][col], char x, int rowi, int coli, in
             {
                 for (int j = top_left_col; j <= top_left_col + 10 && j < col; j++)
                 {
-                    printf("%d ", arr[i][j]);
+                    printf("%d ", arr[i][j].val);
                 }
                 printf("\n");
             }
