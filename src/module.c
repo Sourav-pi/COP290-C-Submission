@@ -353,33 +353,3 @@ void Display(int row, int col, cell arr[row][col], char x, int rowi, int coli, i
         }
     }
 }
-coordinate convert_to_index(char *str)
-{
-    char rev_str[strlen(str) + 1];
-    int len = strlen(str);
-    for (int i = 0; i < len; i++) {
-        rev_str[i] = str[len - i - 1];
-    }
-    rev_str[len] = '\0';
-    int return_index[2]={0,0};
-    int mul_fact=10;
-    int curr=1;
-    for (int i = 0; i < len; i++) {
-        int val = rev_str[i];
-        if (val<65){
-            return_index[0]+=(val-48)*curr;
-            curr*=mul_fact;
-        }
-        else{
-            if (mul_fact==10){
-                curr=1; 
-                mul_fact=26;
-            }
-            return_index[1]+=(val-64)*curr;
-            curr*=mul_fact;
-        }
-        
-    }
-    coordinate c={return_index[0],return_index[1]};
-    return c;
-}
