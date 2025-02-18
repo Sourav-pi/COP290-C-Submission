@@ -15,6 +15,16 @@ typedef struct
     char error[100];
 } commandCall;
 
+typedef struct
+{
+    int val;
+    char cmd[100];
+    char param1[100];
+    char param2[100];
+    // set
+
+} cell;
+
 char *slice(const char *str, int start, int end);
 twostring split(const char *inp, char delim);
 commandCall input(const char *inp);
