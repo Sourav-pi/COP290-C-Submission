@@ -3,6 +3,22 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "../Include/module.h"
+#include "../Include/hash_set.h"
+
+
+//reverse a string in place
+void rev(char* s) {
+    int l = 0;
+    int r = strlen(s) - 1;
+    char t;
+    while (l < r) {
+        t = s[l];
+        s[l] = s[r];
+        s[r] = t;
+        l++;
+        r--;
+    }
+}
 
 //checks if the cell is valid 
 int is_valid_cell(const char *str) {
@@ -282,74 +298,111 @@ int min(int a, int b)
     }
     return b;
 }
-
+void col_convert(int col,char* str){
+    int i=0;
+    while(col>0){
+        int rem=col%26;
+        if(rem==0){
+            str[i++]='Z';
+            col=(col/26)-1;
+        }
+        else{
+            str[i++]=(rem-1)+'A';
+            col=col/26;
+        }
+    }
+    str[i]='\0';
+    rev(str);
+}
 // to display the 10*10 matrix
-void Display(int row, int col, cell arr[row][col], char x, int rowi, int coli, int lastrow, int lastcol)
+void Display(int row, int col, cell** arr, int rowi, int coli)
 {
-    if (rowi != -1 && coli != -1)
-    {
-        for (int i = rowi; i < rowi + 10 && i < rowi; i++)
+        printf("\t");
+        for (int i = coli; i < coli + 10 && i < col; i++)
         {
-            for (int j = coli; j < coli + 10 && j < coli; j++)
+            char str[4];
+            col_convert(i+1,str);
+            printf("%s\t",str); 
+        }
+        printf("\n");
+        
+        for (int i = rowi; i < rowi + 10 && i < row; i++)
+        {
+            printf("%d\t", i+1);
+            for (int j = coli; j < coli + 10 && j < col; j++)
             {
-                printf("%d ", arr[i][j].val);
+                printf("%d\t", arr[i][j].val);
             }
             printf("\n");
         }
-    }
-    else
-    {
-        if (x == 'w')
-        {
-            int top_left_row = max(lastrow - 10, 0);
-            int top_left_col = lastcol;
-            for (int i = top_left_row; i < top_left_row + 10 && i < row; i++)
-            {
-                for (int j = top_left_col; j < top_left_col + 10 && j < col; j++)
-                {
-                    printf("%d ", arr[i][j].val);
-                }
-                printf("\n");
-            }
-        }
-        else if (x == 's')
-        {
-            int top_left_row = min(lastrow + 10, row);
-            int top_left_col = lastcol;
-            for (int i = top_left_row; i <= top_left_row + 10 && i < row; i++)
-            {
-                for (int j = top_left_col; j <= top_left_col + 10 && j < col; j++)
-                {
-                    printf("%d ", arr[i][j].val);
-                }
-                printf("\n");
-            }
-        }
-        else if (x == 'a')
-        {
-            int top_left_row = lastrow;
-            int top_left_col = max(lastcol - 10, 0);
-            for (int i = top_left_row; i <= top_left_row + 10 && i < row; i++)
-            {
-                for (int j = top_left_col; j <= top_left_col + 10 && j < col; j++)
-                {
-                    printf("%d ", arr[i][j].val);
-                }
-                printf("\n");
-            }
-        }
-        else
-        {
-            int top_left_row = lastrow;
-            int top_left_col = min(lastcol + 10, col);
-            for (int i = top_left_row; i <= top_left_row + 10 && i < row; i++)
-            {
-                for (int j = top_left_col; j <= top_left_col + 10 && j < col; j++)
-                {
-                    printf("%d ", arr[i][j].val);
-                }
-                printf("\n");
-            }
-        }
-    }
 }
+
+//converts the cell to index
+coordinate convert_to_index(char *str)
+{
+    char rev_str[strlen(str) + 1];
+    int len = strlen(str);
+    for (int i = 0; i < len; i++) {
+        rev_str[i] = str[len - i - 1];
+    }
+    rev_str[len] = '\0';
+    int return_index[2]={0,0};
+    int mul_fact=10;
+    int curr=1;
+    for (int i = 0; i < len; i++) {
+        int val = rev_str[i];
+        if (val<65){
+            return_index[0]+=(val-48)*curr;
+            curr*=mul_fact;
+        }
+        else{
+            if (mul_fact==10){
+                curr=1; 
+                mul_fact=26;
+            }
+            return_index[1]+=(val-64)*curr;
+            curr*=mul_fact;
+        }
+        
+    }
+    coordinate c={return_index[0],return_index[1]};
+    return c;
+}
+
+cell* create_new_cell() {
+    cell* new_cell = (cell*)malloc(sizeof(cell));
+    if (new_cell == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    new_cell->val = 0;
+    memset(&(new_cell->cmd), 0, sizeof(commandCall));
+    new_cell->dep = create_hashset(); 
+    return new_cell;
+}
+
+void free_cell(cell* c) {
+    free_hashset(c->dep);
+    free(c);
+}
+// coordinate cell_name_to_coordinates(const char *cell_name) {
+//     coordinate coord = {0, 0};
+//     int len = strlen(cell_name);
+//     int i = 0;
+
+//     // Extract column part (letters)
+//     while (i < len && isalpha(cell_name[i])) {
+//         coord.y = coord.y * 26 + (toupper(cell_name[i]) - 'A' + 1);
+//         i++;
+//     }
+//     coord.y--; // Convert to 0-based index
+
+//     // Extract row part (numbers)
+//     while (i < len && isdigit(cell_name[i])) {
+//         coord.x = coord.x * 10 + (cell_name[i] - '0');
+//         i++;
+//     }
+//     coord.x--; // Convert to 0-based index
+
+//     return coord;
+// }

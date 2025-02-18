@@ -1,5 +1,5 @@
-#ifndef MODULE_H
-#define MODULE_H
+#ifndef HASH_SET_H
+#define HASH_SET_H
 
 #define HASHSET_SIZE 100  // Number of buckets
 // Node structure for linked list
@@ -14,7 +14,7 @@ typedef struct HashSet {
 } HashSet;
 
 
-HashSet* create_hashset();
+HashSet* create_hashset(void);
 
 // Check if a string exists in the HashSet
 int contains(HashSet *, const char *);
