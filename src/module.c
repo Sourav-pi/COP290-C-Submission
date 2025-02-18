@@ -5,16 +5,23 @@
 
 char *slice(const char *str, int start, int end)
 {
-    if (str == NULL) return NULL;
+    if (str == NULL)
+        return NULL;
     int len = strlen(str);
-    if (start < 0) start = len + start;
-    if (end <= 0) end = len + end;
-    if (start >= len || start >= end) return NULL;
-    if (end > len) end = len;
-    if (start < 0) start = 0;
+    if (start < 0)
+        start = len + start;
+    if (end <= 0)
+        end = len + end;
+    if (start >= len || start >= end)
+        return NULL;
+    if (end > len)
+        end = len;
+    if (start < 0)
+        start = 0;
     int slice_len = end - start;
     char *result = (char *)malloc(slice_len + 1);
-    if (!result) return NULL;
+    if (!result)
+        return NULL;
     strncpy(result, str + start, slice_len);
     result[slice_len] = '\0';
     return result;
@@ -30,31 +37,40 @@ twostring split(const char *inp, char delim)
         i++;
     }
     s.str1[i] = '\0';
-    if (inp[i] == delim) strcpy(s.str2, &inp[i + 1]);
-    else s.str2[0] = '\0'; 
+    if (inp[i] == delim)
+        strcpy(s.str2, &inp[i + 1]);
+    else
+        s.str2[0] = '\0';
     return s;
 }
 
 int is_valid_cell(const char *str)
 {
     int len = strlen(str);
-    if (len < 2 || len > 6) return 0;
+    if (len < 2 || len > 6)
+        return 0;
     int i = 0;
-    while (i < len && str[i] >= 'A' && str[i] <= 'Z') i++;
-    if (i < 1 || i > 3) return 0;
-    while (i < len && str[i] >= '0' && str[i] <= '9') i++;
-    if (i - (len - i) < 1 || i - (len - i) > 3) return 0;
+    while (i < len && str[i] >= 'A' && str[i] <= 'Z')
+        i++;
+    if (i < 1 || i > 3)
+        return 0;
+    while (i < len && str[i] >= '0' && str[i] <= '9')
+        i++;
+    if (i - (len - i) < 1 || i - (len - i) > 3)
+        return 0;
     return i == len;
 }
 
-commandCall input(const char *inp)
+commandCall parse(const char *inp)
 {
     char cell[100], expr[100];
     char error[100] = "";
     const char *commands[] = {"exit", "w", "a", "s", "d", "disable_output", "enable_output"};
     const char *cmds[] = {"exit", "up", "left", "down", "right", "disable_output", "enable_output"};
-    for (int i = 0; i < 7; i++) {
-        if (strcmp(inp, commands[i]) == 0) {
+    for (int i = 0; i < 7; i++)
+    {
+        if (strcmp(inp, commands[i]) == 0)
+        {
             commandCall retVal;
             strcpy(retVal.cmd, cmds[i]);
             strcpy(retVal.param1, "");
@@ -63,7 +79,8 @@ commandCall input(const char *inp)
             return retVal;
         }
     }
-    if (strncmp("scroll_to ", inp, strlen("scroll_to ")) == 0) {
+    if (strncmp("scroll_to ", inp, strlen("scroll_to ")) == 0)
+    {
         char *cell = slice(inp, strlen("scroll_to "), strlen(inp));
         commandCall retVal;
         strcpy(retVal.cmd, "scroll_to");
@@ -78,7 +95,8 @@ commandCall input(const char *inp)
     strcpy(expr, s.str2);
     printf("Cell: %s\n", cell);
     printf("Expression: %s\n", expr);
-    if (strcmp("", expr) == 0 || strcmp("", cell) == 0) strcpy(error, "Invalid expression");
+    if (strcmp("", expr) == 0 || strcmp("", cell) == 0)
+        strcpy(error, "Invalid expression");
     else
     {
         int ln = (strlen(expr) >= 7) ? 7 : strlen(expr);
@@ -131,7 +149,8 @@ commandCall input(const char *inp)
                     free(sliced2);
                     return retVal;
                 }
-                else strcpy(error, "Invalid expression");
+                else
+                    strcpy(error, "Invalid expression");
             }
         }
         strcpy(error, "Invalid expression");
@@ -139,4 +158,205 @@ commandCall input(const char *inp)
     commandCall emptyRetVal = {"", "", "", ""};
     strcpy(emptyRetVal.error, error);
     return emptyRetVal;
+}
+
+int addition(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
+    {
+        return 0;
+    }
+    return arr[x1][y1] + arr[x2][y2];
+}
+int subtraction(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
+    {
+        return 0;
+    }
+    return arr[x1][y1] - arr[x2][y2];
+}
+int multiply(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
+    {
+        return 0;
+    }
+    return arr[x1][y1] * arr[x2][y2];
+}
+int maximum(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
+    {
+        return 0;
+    }
+    if (arr[x1][y1] >= arr[x2][y2])
+    {
+        return arr[x1][y1];
+    }
+    else
+    {
+        return arr[x2][y2];
+    }
+}
+int maximumrange(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    int max = arr[x1][y1];
+    for (int i = x1; i <= x2; i++)
+    {
+        for (int j = y1; j < y2; j++)
+        {
+            if (max < arr[i][j])
+            {
+                max = arr[i][j];
+            }
+        }
+    }
+    return max;
+}
+int minimumrange(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    int min = arr[x1][y1];
+    for (int i = x1; i <= x2; i++)
+    {
+        for (int j = y1; j < y2; j++)
+        {
+            if (min > arr[i][j])
+            {
+                min = arr[i][j];
+            }
+        }
+    }
+    return min;
+}
+int sumrange(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    int sum = 0;
+    for (int i = x1; i <= x2; i++)
+    {
+        for (int j = y1; j < y2; j++)
+        {
+            sum += arr[i][j];
+        }
+    }
+    return sum;
+}
+int avgrange(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    int freq = (x2 - x1 + 1) * (y2 - y1 + 1);
+    return sum(x1, y1, x2, y2, row, col, arr) / freq;
+}
+int stdev(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    int mean = avgrange(x1, y1, x2, y2, row, col, arr[row][col]);
+    int sum = 0;
+    for (int i = x1; i <= x2; i++)
+    {
+        for (int j = y1; j < y2; j++)
+        {
+            int diff = arr[i][j] - mean;
+            sum += (diff * diff);
+        }
+    }
+    return sum;
+}
+int minimum(int x1, int y1, int x2, int y2, int row, int col, int arr[row][col])
+{
+    if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
+    {
+        return 0;
+    }
+    if (arr[x1][y1] <= arr[x2][y2])
+    {
+        return arr[x1][y1];
+    }
+    else
+    {
+        return arr[x2][y2];
+    }
+}
+int max(int a, int b)
+{
+    if (a >= b)
+    {
+        return a;
+    }
+    return b;
+}
+int min(int a, int b)
+{
+    if (a <= b)
+    {
+        return a;
+    }
+    return b;
+}
+void Display(int row, int col, int arr[row][col], char x, int rowi, int coli, int lastrow, int lastcol)
+{
+    if (rowi != -1 && coli != -1)
+    {
+        for (int i = rowi; i < rowi + 10 && i < rowi; i++)
+        {
+            for (int j = coli; j < coli + 10 && j < coli; j++)
+            {
+                printf("%d ", arr[i][j]);
+            }
+            printf("\n");
+        }
+    }
+    else
+    {
+        if (x == 'w')
+        {
+            int top_left_row = max(lastrow - 10, 0);
+            int top_left_col = lastcol;
+            for (int i = top_left_row; i < top_left_row + 10 && i < row; i++)
+            {
+                for (int j = top_left_col; j < top_left_col + 10 && j < col; j++)
+                {
+                    printf("%d ", arr[i][j]);
+                }
+                printf("\n");
+            }
+        }
+        else if (x == 's')
+        {
+            int top_left_row = min(lastrow + 10, row);
+            int top_left_col = lastcol;
+            for (int i = top_left_row; i <= top_left_row + 10 && i < row; i++)
+            {
+                for (int j = top_left_col; j <= top_left_col + 10 && j < col; j++)
+                {
+                    printf("%d ", arr[i][j]);
+                }
+                printf("\n");
+            }
+        }
+        else if (x == 'a')
+        {
+            int top_left_row = lastrow;
+            int top_left_col = max(lastcol - 10, 0);
+            for (int i = top_left_row; i <= top_left_row + 10 && i < row; i++)
+            {
+                for (int j = top_left_col; j <= top_left_col + 10 && j < col; j++)
+                {
+                    printf("%d ", arr[i][j]);
+                }
+                printf("\n");
+            }
+        }
+        else
+        {
+            int top_left_row = lastrow;
+            int top_left_col = min(lastcol + 10, col);
+            for (int i = top_left_row; i <= top_left_row + 10 && i < row; i++)
+            {
+                for (int j = top_left_col; j <= top_left_col + 10 && j < col; j++)
+                {
+                    printf("%d ", arr[i][j]);
+                }
+                printf("\n");
+            }
+        }
+    }
 }
