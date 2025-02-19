@@ -47,5 +47,7 @@ void Display(int row, int col, cell** arr, int rowi, int coli);
 coordinate convert_to_index(char *str);
 cell* create_new_cell() ;
 void free_cell(cell* c);
+void update(cell *tgt, cell **arr, int row, int col);
+char **topological_sort(char *cell_name, cell **arr, int row, int col);
 
 #endif 

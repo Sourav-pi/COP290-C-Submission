@@ -342,30 +342,34 @@ coordinate convert_to_index(char *str)
 {
     char rev_str[strlen(str) + 1];
     int len = strlen(str);
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++)
+    {
         rev_str[i] = str[len - i - 1];
     }
     rev_str[len] = '\0';
-    int return_index[2]={0,0};
-    int mul_fact=10;
-    int curr=1;
-    for (int i = 0; i < len; i++) {
+    int return_index[2] = {0, 0};
+    int mul_fact = 10;
+    int curr = 1;
+    for (int i = 0; i < len; i++)
+    {
         int val = rev_str[i];
-        if (val<65){
-            return_index[0]+=(val-48)*curr;
-            curr*=mul_fact;
+        if (val < 65)
+        {
+            return_index[0] += (val - 48) * curr;
+            curr *= mul_fact;
         }
-        else{
-            if (mul_fact==10){
-                curr=1; 
-                mul_fact=26;
+        else
+        {
+            if (mul_fact == 10)
+            {
+                curr = 1;
+                mul_fact = 26;
             }
-            return_index[1]+=(val-64)*curr;
-            curr*=mul_fact;
+            return_index[1] += (val - 64) * curr;
+            curr *= mul_fact;
         }
-        
     }
-    coordinate c={return_index[0],return_index[1]};
+    coordinate c = {return_index[0] - 1, return_index[1] - 1};
     return c;
 }
 
@@ -406,3 +410,77 @@ void free_cell(cell* c) {
 
 //     return coord;
 // }
+
+
+void topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sorted_cells, int *index, cell **arr)
+{
+    
+    if (contains(stack, v))
+    {
+        fprintf(stderr, "Cycle detected in the graph\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (!contains(visited, v))
+    {
+        insert(visited, v);
+        insert(stack, v);
+        coordinate dep_coord = convert_to_index(v);
+        cell *par = &arr[dep_coord.x][dep_coord.y];
+        HashSet *set = par->dep;
+        for (int i = 0; i < HASHSET_SIZE; i++)
+        { // Loop through all buckets
+            Node *current = set->buckets[i];
+            while (current)
+            { // Traverse the linked list in each bucket
+                // callback(current->value);  // Call the callback function with the string
+                topological_sort_util(current->value, visited, stack, sorted_cells, index, arr);
+                current = current->next;
+            }
+        }
+
+        remove_string(stack, v);
+        char *new_str = (char *)malloc(strlen(v) + 1);
+        strcpy(new_str, v);
+        sorted_cells[(*index)++] = new_str;
+    }
+}
+
+char **topological_sort(char *cell_name, cell **arr, int row, int col)
+{
+    coordinate coord = convert_to_index(cell_name);
+    cell *start = &arr[coord.x][coord.y];
+    printf("hello1\n");
+    int total_cells = row*col;
+    printf("hello2\n");
+    HashSet *visited = create_hashset();
+    printf("hello3\n");
+    HashSet *stack = create_hashset();
+    printf("hello4\n");
+    char **sorted_cells = (char **)malloc(total_cells * sizeof(char *));
+    printf("hello5\n");
+    if (sorted_cells == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    int index = 0;
+    printf("hello6\n");
+    
+    topological_sort_util(cell_name, visited, stack, sorted_cells, &index, arr);
+    printf("hello7\n");
+
+    // free(sorted_cells);
+    free_hashset(visited);
+    free_hashset(stack);
+    printf("index:%d\n", index);
+
+    for (int i = 0; i < index / 2; i++)
+    {
+        char *temp = sorted_cells[i];
+        sorted_cells[i] = sorted_cells[index - i - 1];
+        sorted_cells[index - i - 1] = temp;
+    }
+    printf("hello8\n");
+    return sorted_cells;
+}

@@ -144,6 +144,18 @@ int main(int argc, char *argv[])
         else if(strcmp(parsed_inp.type,"art")==0){
             
         }
+
+
+        char** sorted_cell_names = topological_sort(parsed_inp.target,arr,row,col);
+        for (int i = 0; sorted_cell_names[i] != NULL; i++) {
+            coordinate c=convert_to_index(sorted_cell_names[i]);
+            cell* cell_ptr=&arr[c.x][c.y];
+            printf("%s ",sorted_cell_names[i]);
+            update(cell_ptr,arr,row,col);
+            free(sorted_cell_names[i]);
+        }
+        printf("\n");
+        free(sorted_cell_names);
         end = clock();
         time = ((double)(end - start)) / CLOCKS_PER_SEC;
         }
