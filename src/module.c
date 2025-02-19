@@ -166,8 +166,8 @@ commandCall parse(char *inp) {
     return cmd;
 }
 
-//operations
-int addition(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+// operations
+int addition(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {
@@ -175,7 +175,7 @@ int addition(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col
     }
     return arr[x1][y1].val + arr[x2][y2].val;
 }
-int subtraction(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+int subtraction(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {
@@ -183,7 +183,7 @@ int subtraction(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][
     }
     return arr[x1][y1].val - arr[x2][y2].val;
 }
-int multiply(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+int multiply(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {
@@ -191,7 +191,7 @@ int multiply(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col
     }
     return arr[x1][y1].val * arr[x2][y2].val;
 }
-int maximum(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+int maximum(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {
@@ -206,7 +206,7 @@ int maximum(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col]
         return arr[x2][y2].val;
     }
 }
-int maximumrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+int maximumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     int max = arr[x1][y1].val;
     for (int i = x1; i <= x2; i++)
@@ -221,7 +221,7 @@ int maximumrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row]
     }
     return max;
 }
-int minimumrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+int minimumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     int min = arr[x1][y1].val;
     for (int i = x1; i <= x2; i++)
@@ -236,7 +236,7 @@ int minimumrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row]
     }
     return min;
 }
-int sumrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+int sumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     int sum = 0;
     for (int i = x1; i <= x2; i++)
@@ -248,12 +248,12 @@ int sumrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col
     }
     return sum;
 }
-int avgrange(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+int avgrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     int freq = (x2 - x1 + 1) * (y2 - y1 + 1);
     return sumrange(x1, y1, x2, y2, row, col, arr) / freq;
 }
-int stdev(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+int stdev(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     int mean = avgrange(x1, y1, x2, y2, row, col, arr);
     int sum = 0;
@@ -267,7 +267,7 @@ int stdev(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
     }
     return sum;
 }
-int minimum(int x1, int y1, int x2, int y2, int row, int col, cell arr[row][col])
+int minimum(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
 {
     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
     {

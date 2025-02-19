@@ -36,11 +36,11 @@ typedef struct
 
 commandCall parse(char *inp);
 int is_valid_cell(const char *str);
-int addition (int x1,int y1,int x2,int y2,int row,int col,cell arr[row][col]);
-int subtraction (int x1,int y1,int x2,int y2,int row,int col,cell arr[row][col]);
-int multiply (int x1,int y1,int x2,int y2,int row,int col,cell arr[row][col]);
-int maximum (int x1,int y1,int x2,int y2,int row,int col,cell arr[row][col]);
-int minimum (int x1,int y1,int x2,int y2,int row,int col,cell arr[row][col]);
+int addition (int x1,int y1,int x2,int y2,int row,int col,cell** arr);
+int subtraction (int x1,int y1,int x2,int y2,int row,int col,cell** arr);
+int multiply (int x1,int y1,int x2,int y2,int row,int col,cell** arr);
+int maximum (int x1,int y1,int x2,int y2,int row,int col,cell** arr);
+int minimum (int x1,int y1,int x2,int y2,int row,int col,cell** arr);
 int max(int a , int b);
 int min(int a , int b);
 void Display(int row, int col, cell** arr, int rowi, int coli);
