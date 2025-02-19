@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     for (int i=0;i<row;i++){
         for(int j=0;j<col;j++){
             commandCall new_command={0,};
-            cell new_cell={i*j,new_command,create_hashset()};
+            cell new_cell={0,new_command,create_hashset()};
             arr[i][j]=new_cell;
         }
     }
@@ -38,12 +38,27 @@ int main(int argc, char *argv[])
         printf("[%.2f] (%s) > ",time,status);
         scanf("%s",raw_inp);
         parsed_inp=parse(raw_inp);
+        // printf("error: %s\n",parsed_inp.error);
+        printf("parsed_inp:\n");
+        printf("cmd: %s\n", parsed_inp.cmd);
+        printf("type: %s\n", parsed_inp.type);
+        printf("type1: %s\n", parsed_inp.type1);
+        printf("type2: %s\n", parsed_inp.type2);
+        printf("param1: %s\n", parsed_inp.param1);
+        printf("param2: %s\n", parsed_inp.param2);
+        printf("target: %s\n", parsed_inp.target);
+        printf("error: %s\n", parsed_inp.error);
+        if(strcmp(parsed_inp.error,"")!=0){
+            strcpy(status,parsed_inp.error);
+            printf("error: %s\n",parsed_inp.error);
+            continue;
+        }
         start = clock();
         if(strcmp(parsed_inp.type,"cmd")==0){
             // scroll_to not working
             if(strcmp(parsed_inp.cmd,"scroll_to")==0){
                 coordinate c=convert_to_index(parsed_inp.param1);
-                printf("%d %d\n",c.x,c.y);
+                // printf("%d %d\n",c.x,c.y);
                 if(c.x<row && c.y<col){
                     disp_c.x=c.x;
                     disp_c.y=c.y;
@@ -139,13 +154,124 @@ int main(int argc, char *argv[])
             // }
         }
         else if(strcmp(parsed_inp.type,"val")==0){
+            char *ins1=parsed_inp.type1;
+            coordinate c= convert_to_index(parsed_inp.target);
+            cell* tgt =&arr[c.x][c.y];
+            tgt->cmd = parsed_inp;
+            // printf("hello:");
+            // printf("hello:%d,%d\n",c.x,c.y);
+            if(strcmp(ins1 ,"val")==0){
+                tgt->val=atoi(parsed_inp.param1);
+                // printf("vaLLl: ÷%d\n",tgt->val);
+            }else{
+                coordinate source1=convert_to_index(parsed_inp.param1);
+                tgt->val=arr[source1.x][source1.y].val;
+                cell source1_cell=arr[source1.x][source1.y];
+                insert(source1_cell.dep,parsed_inp.target);
+                // iterate_hashset(source1_cell.dep,print_element);
 
+                
+            }
         }
         else if(strcmp(parsed_inp.type,"art")==0){
+            coordinate c = convert_to_index(parsed_inp.target);
+            cell* tgt = &arr[c.x][c.y];
+            tgt->cmd = parsed_inp;
+            if (strcmp(parsed_inp.type1, "val") == 0)
+            {
+                if (strcmp(parsed_inp.type2, "val") == 0)
+                {
+                    if (strcmp(parsed_inp.cmd, "add") == 0)
+                    {
+                        tgt->val = atoi(parsed_inp.param1) + atoi(parsed_inp.param2);
+                    }
+                    else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                    {
+                        tgt->val = atoi(parsed_inp.param1) - atoi(parsed_inp.param2);
+                    }
+                    else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                    {
+                        tgt->val = atoi(parsed_inp.param1) * atoi(parsed_inp.param2);
+                    }
+                    else
+                    {
+                        tgt->val = atoi(parsed_inp.param1) / atoi(parsed_inp.param2);
+                    }
+                }
+                else
+                {
+                    coordinate source2 = convert_to_index(parsed_inp.param2);
+                    cell source2_cell = arr[source2.x][source2.y];
+                    insert(source2_cell.dep, parsed_inp.target);
+                    if (strcmp(parsed_inp.cmd, "add") == 0)
+                    {
+                        tgt->val = atoi(parsed_inp.param1) + arr[source2.x][source2.y].val;
+                    }
+                    else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                    {
+                        tgt->val = atoi(parsed_inp.param1) - arr[source2.x][source2.y].val;
+                    }
+                    else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                    {
+                        tgt->val = atoi(parsed_inp.param1) * arr[source2.x][source2.y].val;
+                    }
+                    else
+                    {
+                        tgt->val = atoi(parsed_inp.param1) / arr[source2.x][source2.y].val;
+                    }
+                }
+            }
+            else
+            {
+                coordinate source1 = convert_to_index(parsed_inp.param1);
+                cell source1_cell = arr[source1.x][source1.y];
+                insert(source1_cell.dep, parsed_inp.target);
+
+                if (strcmp(parsed_inp.type2, "val") == 0)
+                {
+                    coordinate source1 = convert_to_index(parsed_inp.param1);
+                    if (strcmp(parsed_inp.cmd, "add") == 0)
+                    {
+                        tgt->val = atoi(parsed_inp.param2) + arr[source1.x][source1.y].val;
+                    }
+                    else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                    {
+                        tgt->val = atoi(parsed_inp.param2) - arr[source1.x][source1.y].val;
+                    }
+                    else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                    {
+                        tgt->val = atoi(parsed_inp.param2) * arr[source1.x][source1.y].val;
+                    }
+                    else
+                    {
+                        tgt->val = atoi(parsed_inp.param2) / arr[source1.x][source1.y].val;
+                    }
+                }
+                else
+                {
+                    coordinate source1 = convert_to_index(parsed_inp.param1);
+                    coordinate source2 = convert_to_index(parsed_inp.param2);
+                    cell source2_cell = arr[source2.x][source2.y];
+                    insert(source2_cell.dep, parsed_inp.target);
+                    if (strcmp(parsed_inp.cmd, "add") == 0)
+                    {
+                        tgt->val = addition(source1.x, source1.y, source2.x, source2.y, row, col, arr);
+                    }
+                    else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                    {
+                        tgt->val = subtraction(source1.x, source2.y, source2.x, source2.y, row, col, arr);
+                    }
+                    else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                    {
+                        tgt->val = multiply(source1.x, source2.y, source2.x, source2.y, row, col, arr);
+                    }
+                }
+            }
             
         }
 
 
+        // printf("parsed_inp:\n");
         char** sorted_cell_names = topological_sort(parsed_inp.target,arr,row,col);
         for (int i = 0; sorted_cell_names[i] != NULL; i++) {
             coordinate c=convert_to_index(sorted_cell_names[i]);

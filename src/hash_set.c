@@ -108,29 +108,3 @@ void free_hashset(HashSet *set) {
 void print_string(const char *str) {
     printf("%s ", str);
 }
-
-
-int main() {
-    HashSet *set = create_hashset();
-
-    insert(set, "apple");
-    insert(set, "banana");
-    insert(set, "cherry");
-
-    printf("Contains 'apple': %d\n", contains(set, "apple"));   // Output: 1
-    printf("Contains 'grape': %d\n", contains(set, "grape"));   // Output: 0
-
-    printf("Contents of HashSet:\n");
-    iterate_hashset(set, print_string);
-    printf("\n");
-
-    remove_string(set, "banana");
-    printf("Contains 'banana': %d\n", contains(set, "banana")); // Output: 0
-
-    printf("Contents of HashSet:\n");
-    iterate_hashset(set, print_string);
-    printf("\n");
-
-    free_hashset(set);
-    return 0;
-}

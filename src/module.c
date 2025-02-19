@@ -5,13 +5,14 @@
 #include "../Include/module.h"
 #include "../Include/hash_set.h"
 
-
-//reverse a string in place
-void rev(char* s) {
+// reverse a string in place
+void rev(char *s)
+{
     int l = 0;
     int r = strlen(s) - 1;
     char t;
-    while (l < r) {
+    while (l < r)
+    {
         t = s[l];
         s[l] = s[r];
         s[r] = t;
@@ -20,8 +21,9 @@ void rev(char* s) {
     }
 }
 
-//checks if the cell is valid 
-int is_valid_cell(const char *str) {
+// checks if the cell is valid
+int is_valid_cell(const char *str)
+{
     int len = strlen(str);
     if (len < 2 || len > 6)
         return 0;
@@ -37,129 +39,172 @@ int is_valid_cell(const char *str) {
     return i == len;
 }
 
-//checks if the value is valid (number in string form)
-int is_valid_val(char *str) {
-    while (*str) {
-        if (!isdigit(*str)) return 0;
+// checks if the value is valid (number in string form)
+int is_valid_val(char *str)
+{
+    while (*str)
+    {
+        if (!isdigit(*str))
+            return 0;
         str++;
     }
     return 1;
 }
 
 // parses the input and returns the commandCall structure
-commandCall parse(char *inp) {
-    commandCall cmd = {0}; 
+commandCall parse(char *inp)
+{
+    commandCall cmd = {0};
 
     // Handle simple commands
-    if(strcmp(inp,"disable_output")==0 || strcmp(inp,"enable_output")==0|| strcmp(inp,"w")==0||strcmp(inp,"d")==0||strcmp(inp,"a")==0||strcmp(inp,"s")==0){
-        strcpy(cmd.type,"cmd");
-        strcpy(cmd.cmd,inp);
-
+    if (strcmp(inp, "disable_output") == 0 || strcmp(inp, "enable_output") == 0 || strcmp(inp, "w") == 0 || strcmp(inp, "d") == 0 || strcmp(inp, "a") == 0 || strcmp(inp, "s") == 0)
+    {
+        strcpy(cmd.type, "cmd");
+        strcpy(cmd.cmd, inp);
     }
-    else if(sscanf(inp,"scroll_to %s",cmd.param1)==1){
-        strcpy(cmd.type,"cmd");
-        strcpy(cmd.cmd,"scroll_to");
-        if (is_valid_cell(cmd.param1)){
-            strcpy(cmd.type1,"cell");
+    else if (sscanf(inp, "scroll_to %s", cmd.param1) == 1)
+    {
+        strcpy(cmd.type, "cmd");
+        strcpy(cmd.cmd, "scroll_to");
+        if (is_valid_cell(cmd.param1))
+        {
+            strcpy(cmd.type1, "cell");
         }
-        else{
-            strcpy(cmd.error,"Invalid cell");
+        else
+        {
+            strcpy(cmd.error, "Invalid cell");
         }
     }
     // Handle function commands
-    else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", cmd.target, cmd.cmd, cmd.param1, cmd.param2) == 4) { 
-         if (strcmp(cmd.cmd, "MAX") == 0 || strcmp(cmd.cmd, "MIN") == 0 ||
-                   strcmp(cmd.cmd, "SUM") == 0 || strcmp(cmd.cmd, "AVG") == 0 ||
-                   strcmp(cmd.cmd, "STDEV") == 0) {
+    else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", cmd.target, cmd.cmd, cmd.param1, cmd.param2) == 4)
+    {
+        if (strcmp(cmd.cmd, "MAX") == 0 || strcmp(cmd.cmd, "MIN") == 0 ||
+            strcmp(cmd.cmd, "SUM") == 0 || strcmp(cmd.cmd, "AVG") == 0 ||
+            strcmp(cmd.cmd, "STDEV") == 0)
+        {
             strcpy(cmd.type, "func");
-                if (is_valid_val(cmd.param1)) {
-                strcpy(cmd.type1, "val"); 
-            } else if (is_valid_cell(cmd.param1)) {
+            if (is_valid_val(cmd.param1))
+            {
+                strcpy(cmd.type1, "val");
+            }
+            else if (is_valid_cell(cmd.param1))
+            {
                 strcpy(cmd.type1, "cell");
-            } else {
+            }
+            else
+            {
                 strcpy(cmd.error, "Invalid param1");
                 return cmd;
             }
 
-            if (is_valid_val(cmd.param2)) {
+            if (is_valid_val(cmd.param2))
+            {
                 strcpy(cmd.type2, "val");
-            } else if (is_valid_cell(cmd.param2)) {
+            }
+            else if (is_valid_cell(cmd.param2))
+            {
                 strcpy(cmd.type2, "cell");
-            } else {
+            }
+            else
+            {
                 strcpy(cmd.error, "Invalid param2");
                 return cmd;
             }
 
-            if(strcmp(cmd.type1,cmd.type2)!=0){
+            if (strcmp(cmd.type1, cmd.type2) != 0)
+            {
                 strcpy(cmd.error, "param1 and param2 type dont match");
                 return cmd;
             }
-            
-        } else {
+        }
+        else
+        {
             strcpy(cmd.error, "Unknown command");
         }
-    } else if(sscanf(inp,"SLEEP(%s)",cmd.param1)==1){
-        strcpy(cmd.type,"func");
-        strcpy(cmd.cmd,"SLEEP");
-        if (is_valid_val(cmd.param1)){
-            strcpy(cmd.type1,"val");
+    }
+    else if (sscanf(inp, "SLEEP(%s)", cmd.param1) == 1)
+    {
+        strcpy(cmd.type, "func");
+        strcpy(cmd.cmd, "SLEEP");
+        if (is_valid_val(cmd.param1))
+        {
+            strcpy(cmd.type1, "val");
         }
-        else{
-            strcpy(cmd.error,"Invalid param1");
+        else
+        {
+            strcpy(cmd.error, "Invalid param1");
         }
-
-    } 
+    }
     // Handle arithmetic commands
-    else if(sscanf(inp, "%[^=]=%[^+-*/]%[+-*/]%s", cmd.target, cmd.param1,cmd.cmd, cmd.param2) == 4){
-            strcpy(cmd.type, "art");
-            
-            switch (cmd.cmd[0]) {
-                case '+':
-                    strcpy(cmd.cmd, "add");
-                    break;
-                case '-':
-                    strcpy(cmd.cmd, "sub");
-                    break;
-                case '*':
-                    strcpy(cmd.cmd, "mul");
-                    break;
-                case '/':
-                    strcpy(cmd.cmd, "div");
-                    break;
-            }
+    else if (sscanf(inp, "%[^=]=%[^+-*/]%[+-*/]%s", cmd.target, cmd.param1, cmd.cmd, cmd.param2) == 4)
+    {
+        strcpy(cmd.type, "art");
 
-            if (is_valid_val(cmd.param1)) {
-                strcpy(cmd.type1, "val"); 
-            } else if (is_valid_cell(cmd.param1)) {
-                strcpy(cmd.type1, "cell");
-            } else {
-                strcpy(cmd.error, "Invalid param1");
-                return cmd;
-            }
+        switch (cmd.cmd[0])
+        {
+        case '+':
+            strcpy(cmd.cmd, "add");
+            break;
+        case '-':
+            strcpy(cmd.cmd, "sub");
+            break;
+        case '*':
+            strcpy(cmd.cmd, "mul");
+            break;
+        case '/':
+            strcpy(cmd.cmd, "div");
+            break;
+        }
 
-            if (is_valid_val(cmd.param2)) {
-                strcpy(cmd.type2, "val");
-            } else if (is_valid_cell(cmd.param2)) {
-                strcpy(cmd.type2, "cell");
-            } else {
-                strcpy(cmd.error, "Invalid param2");
-                return cmd;
-            } 
-            
-            }
+        if (is_valid_val(cmd.param1))
+        {
+            strcpy(cmd.type1, "val");
+        }
+        else if (is_valid_cell(cmd.param1))
+        {
+            strcpy(cmd.type1, "cell");
+        }
+        else
+        {
+            strcpy(cmd.error, "Invalid param1");
+            return cmd;
+        }
+
+        if (is_valid_val(cmd.param2))
+        {
+            strcpy(cmd.type2, "val");
+        }
+        else if (is_valid_cell(cmd.param2))
+        {
+            strcpy(cmd.type2, "cell");
+        }
+        else
+        {
+            strcpy(cmd.error, "Invalid param2");
+            return cmd;
+        }
+    }
     // Handle simple value/cell assignment
-    else if (sscanf(inp, "%[^=]=%s", cmd.target, cmd.param1) == 2) {
+    else if (sscanf(inp, "%[^=]=%s", cmd.target, cmd.param1) == 2)
+    {
         strcpy(cmd.type, "val");
         strcpy(cmd.cmd, "set");
 
-        if (is_valid_val(cmd.param1)) {
+        if (is_valid_val(cmd.param1))
+        {
             strcpy(cmd.type1, "val");
-        } else if (is_valid_cell(cmd.param1)) {
+        }
+        else if (is_valid_cell(cmd.param1))
+        {
             strcpy(cmd.type1, "cell");
-        } else {
+        }
+        else
+        {
             strcpy(cmd.error, "Invalid value or cell in param1");
         }
-    } else {
+    }
+    else
+    {
         strcpy(cmd.error, "Invalid input format");
     }
 
@@ -298,46 +343,50 @@ int min(int a, int b)
     }
     return b;
 }
-void col_convert(int col,char* str){
-    int i=0;
-    while(col>0){
-        int rem=col%26;
-        if(rem==0){
-            str[i++]='Z';
-            col=(col/26)-1;
+void col_convert(int col, char *str)
+{
+    int i = 0;
+    while (col > 0)
+    {
+        int rem = col % 26;
+        if (rem == 0)
+        {
+            str[i++] = 'Z';
+            col = (col / 26) - 1;
         }
-        else{
-            str[i++]=(rem-1)+'A';
-            col=col/26;
+        else
+        {
+            str[i++] = (rem - 1) + 'A';
+            col = col / 26;
         }
     }
-    str[i]='\0';
+    str[i] = '\0';
     rev(str);
 }
 // to display the 10*10 matrix
-void Display(int row, int col, cell** arr, int rowi, int coli)
+void Display(int row, int col, cell **arr, int rowi, int coli)
 {
-        printf("\t");
-        for (int i = coli; i < coli + 10 && i < col; i++)
+    printf("\t");
+    for (int i = coli; i < coli + 10 && i < col; i++)
+    {
+        char str[4];
+        col_convert(i + 1, str);
+        printf("%s\t", str);
+    }
+    printf("\n");
+
+    for (int i = rowi; i < rowi + 10 && i < row; i++)
+    {
+        printf("%d\t", i + 1);
+        for (int j = coli; j < coli + 10 && j < col; j++)
         {
-            char str[4];
-            col_convert(i+1,str);
-            printf("%s\t",str); 
+            printf("%d\t", arr[i][j].val);
         }
         printf("\n");
-        
-        for (int i = rowi; i < rowi + 10 && i < row; i++)
-        {
-            printf("%d\t", i+1);
-            for (int j = coli; j < coli + 10 && j < col; j++)
-            {
-                printf("%d\t", arr[i][j].val);
-            }
-            printf("\n");
-        }
+    }
 }
 
-//converts the cell to index
+// converts the cell to index
 coordinate convert_to_index(char *str)
 {
     char rev_str[strlen(str) + 1];
@@ -373,19 +422,22 @@ coordinate convert_to_index(char *str)
     return c;
 }
 
-cell* create_new_cell() {
-    cell* new_cell = (cell*)malloc(sizeof(cell));
-    if (new_cell == NULL) {
+cell *create_new_cell()
+{
+    cell *new_cell = (cell *)malloc(sizeof(cell));
+    if (new_cell == NULL)
+    {
         fprintf(stderr, "Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
     new_cell->val = 0;
     memset(&(new_cell->cmd), 0, sizeof(commandCall));
-    new_cell->dep = create_hashset(); 
+    new_cell->dep = create_hashset();
     return new_cell;
 }
 
-void free_cell(cell* c) {
+void free_cell(cell *c)
+{
     free_hashset(c->dep);
     free(c);
 }
