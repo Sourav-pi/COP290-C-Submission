@@ -536,3 +536,107 @@ char **topological_sort(char *cell_name, cell **arr, int row, int col)
     printf("hello8\n");
     return sorted_cells;
 }
+
+void update(cell *tgt, cell **arr, int row, int col)
+{
+    commandCall parsed_inp = tgt->cmd;
+    if (strcmp(parsed_inp.type, "val") == 0)
+    {
+        if (strcmp(parsed_inp.type1, "val") == 0)
+        {
+            tgt->val = atoi(parsed_inp.param1);
+        }
+        else
+        {
+            coordinate source1 = convert_to_index(parsed_inp.param1);
+            tgt->val = arr[source1.x][source1.y].val;
+        }
+    }
+    else if (strcmp(parsed_inp.type, "art") == 0)
+    {
+        if (strcmp(parsed_inp.type1, "val") == 0)
+        {
+            if (strcmp(parsed_inp.type2, "val") == 0)
+            {
+                if (strcmp(parsed_inp.cmd, "add") == 0)
+                {
+                    tgt->val = atoi(parsed_inp.param1) + atoi(parsed_inp.param2);
+                }
+                else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                {
+                    tgt->val = atoi(parsed_inp.param1) - atoi(parsed_inp.param2);
+                }
+                else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                {
+                    tgt->val = atoi(parsed_inp.param1) * atoi(parsed_inp.param2);
+                }
+                else
+                {
+                    tgt->val = atoi(parsed_inp.param1) / atoi(parsed_inp.param2);
+                }
+            }
+            else
+            {
+                coordinate source2 = convert_to_index(parsed_inp.param2);
+                if (strcmp(parsed_inp.cmd, "add") == 0)
+                {
+                    tgt->val = atoi(parsed_inp.param1) + arr[source2.x][source2.y].val;
+                }
+                else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                {
+                    tgt->val = atoi(parsed_inp.param1) - arr[source2.x][source2.y].val;
+                }
+                else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                {
+                    tgt->val = atoi(parsed_inp.param1) * arr[source2.x][source2.y].val;
+                }
+                else
+                {
+                    tgt->val = atoi(parsed_inp.param1) / arr[source2.x][source2.y].val;
+                }
+            }
+        }
+        else
+        {
+            coordinate source1 = convert_to_index(parsed_inp.param1);
+
+            if (strcmp(parsed_inp.type2, "val") == 0)
+            {
+                coordinate source1 = convert_to_index(parsed_inp.param1);
+                if (strcmp(parsed_inp.cmd, "add") == 0)
+                {
+                    tgt->val = atoi(parsed_inp.param2) + arr[source1.x][source1.y].val;
+                }
+                else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                {
+                    tgt->val = atoi(parsed_inp.param2) - arr[source1.x][source1.y].val;
+                }
+                else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                {
+                    tgt->val = atoi(parsed_inp.param2) * arr[source1.x][source1.y].val;
+                }
+                else
+                {
+                    tgt->val = atoi(parsed_inp.param2) / arr[source1.x][source1.y].val;
+                }
+            }
+            else
+            {
+                coordinate source1 = convert_to_index(parsed_inp.param1);
+                coordinate source2 = convert_to_index(parsed_inp.param2);
+                if (strcmp(parsed_inp.cmd, "add") == 0)
+                {
+                    tgt->val = addition(source1.x, source1.y, source2.x, source2.y, row, col, arr);
+                }
+                else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                {
+                    tgt->val = subtraction(source1.x, source2.y, source2.x, source2.y, row, col, arr);
+                }
+                else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                {
+                    tgt->val = multiply(source1.x, source2.y, source2.x, source2.y, row, col, arr);
+                }
+            }
+        }
+    }
+}
