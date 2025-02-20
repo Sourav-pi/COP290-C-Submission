@@ -10,14 +10,14 @@ typedef struct
     // func -> cmd is MIN,MAX,SUM,AVG,STDEV,SLEEP
     // cmd -> cmd is scroll_to, disable_output, enable_output, w, d, a, s  
     
-    char type[100];     // val, art, func, cmd
-    char cmd[100];      // add, sub, mul, div, MIN, MAX, SUM, AVG, STDEV, SLEEP scroll_to, disable_output, enable_output, w, d, a, s
-    char target[100];
-    char param1[100];   // any cell or value or ""
-    char type1[100];    // val, cell
-    char param2[100];   // any cell or value or ""
-    char type2[100];    // val, cell
-    char error[100];
+    char type[5];     // val, art, func, cmd
+    char cmd[15];      // add, sub, mul, div, MIN, MAX, SUM, AVG, STDEV, SLEEP, scroll_to, disable_output, enable_output, w, d, a, s
+    char target[8];
+    char param1[8];   // any cell or value or ""
+    char type1[5];    // val, cell
+    char param2[8];   // any cell or value or ""
+    char type2[5];    // val, cell
+    char error[10];
 } commandCall;
 
 #include "hash_set.h"

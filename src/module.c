@@ -463,14 +463,70 @@ void free_cell(cell *c)
 //     return coord;
 // }
 
+// void topological_sort_util(cell* v, HashSet* visited, HashSet* stack, cell** sorted_cells, int* index) {
+//     if (hash_set_contains(stack, v)) {
+//         fprintf(stderr, "Cycle detected in the graph\n");
+//         exit(EXIT_FAILURE);
+//     }
 
-void topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sorted_cells, int *index, cell **arr)
+//     if (!hash_set_contains(visited, v)) {
+//         hash_set_add(visited, v);
+//         hash_set_add(stack, v);
+
+//         void callback(const char* dep_name) {
+//             coordinate dep_coord = convert_to_index((char*)dep_name);
+//             cell* child = &arr[dep_coord.x][dep_coord.y];
+//             topological_sort_util(child, visited, stack, sorted_cells, index);
+//         };
+//         iterate_hashset(v->dep, callback);
+
+//         remove_string(stack, v);
+//         sorted_cells[(*index)++] = v;
+//     }
+// }
+
+// char** topological_sort(char* cell_name, cell** arr) {
+//     coordinate coord = convert_to_index(cell_name);
+//     cell* start = &arr[coord.x][coord.y];
+
+//     int total_cells = 0;
+//     for (int i = 0; arr[i] != NULL; i++) {
+//         for (int j = 0; arr[i][j].val != -1; j++) {
+//             total_cells++;
+//         }
+//     }
+
+//     HashSet* visited = create_hashset();
+//     HashSet* stack = create_hashset();
+//     cell** sorted_cells = (cell**)malloc(total_cells * sizeof(cell*));
+//     if (sorted_cells == NULL) {
+//         fprintf(stderr, "Memory allocation failed\n");
+//         exit(EXIT_FAILURE);
+//     }
+//     int index = 0;
+
+//     topological_sort_util(start, visited, stack, sorted_cells, &index);
+
+//     char** sorted_cell_names = (char**)malloc((index + 1) * sizeof(char*));
+//     for (int i = 0; i < index; i++) {
+//         sorted_cell_names[i] = sorted_cells[i]->cmd.target;
+//     }
+//     sorted_cell_names[index] = NULL;
+
+//     free(sorted_cells);
+//     free_hashset(visited);
+//     free_hashset(stack);
+
+//     return sorted_cell_names;
+// }
+
+int topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sorted_cells, int *index, cell **arr)
 {
     
     if (contains(stack, v))
     {
-        fprintf(stderr, "Cycle detected in the graph\n");
-        exit(EXIT_FAILURE);
+        printf("Vishal\n");
+        return 1;
     }
 
     if (!contains(visited, v))
@@ -486,7 +542,7 @@ void topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sor
             while (current)
             { // Traverse the linked list in each bucket
                 // callback(current->value);  // Call the callback function with the string
-                topological_sort_util(current->value, visited, stack, sorted_cells, index, arr);
+                return topological_sort_util(current->value, visited, stack, sorted_cells, index, arr);
                 current = current->next;
             }
         }
@@ -496,6 +552,7 @@ void topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sor
         strcpy(new_str, v);
         sorted_cells[(*index)++] = new_str;
     }
+    return 0;
 }
 
 char **topological_sort(char *cell_name, cell **arr, int row, int col)
@@ -519,7 +576,10 @@ char **topological_sort(char *cell_name, cell **arr, int row, int col)
     int index = 0;
     printf("hello6\n");
     
-    topological_sort_util(cell_name, visited, stack, sorted_cells, &index, arr);
+    int is_cycle = topological_sort_util(cell_name, visited, stack, sorted_cells, &index, arr);
+    if(is_cycle==1){
+        return NULL;
+    }
     printf("hello7\n");
 
     // free(sorted_cells);
