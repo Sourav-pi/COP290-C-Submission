@@ -45,19 +45,23 @@ typedef struct
     unsigned int type1 : 1; // val, cell
     unsigned int type2 : 1; // val, cell
     unsigned int error : 2;
+    char isDivByZero;
     // char target[7];
-    int target;
     // char param1[7];         // any cell or value or "" 
     int param1;
     // char param2[7];         // any cell or value or ""
     int param2;
 } commandCall;
 
+typedef struct {
+    int target;
+    commandCall cmd;
+
+} commandContainer;
 
 typedef struct
 {
     int val;
-    char isDivByZero;
     commandCall cmd;
     HashSet* dep;
 } cell;
@@ -68,7 +72,7 @@ typedef struct
     int y;
 }coordinate;
 
-commandCall parse(char *inp, int hasSign);
+commandContainer parse(char *inp, int hasSign);
 int is_valid_cell(char *str);
 int addition (int x1,int y1,int x2,int y2,int row,int col,cell** arr);
 int subtraction (int x1,int y1,int x2,int y2,int row,int col,cell** arr);

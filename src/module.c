@@ -96,12 +96,13 @@ int is_valid_val(char *str)
 // parses the input and returns the commandCall structure
 char temp[6];
 
-commandCall parse(char *inp, int hasSign)
+commandContainer parse(char *inp, int hasSign)
 {
     char temp_target[10];
     char temp_param1[10];
     char temp_param2[10];
     commandCall cmd = {0};
+    commandContainer cmdc;
     cmd.error = OK;
     char sym1[12];
     char sym2[12];
@@ -162,7 +163,8 @@ commandCall parse(char *inp, int hasSign)
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             // printf("2");
-            return cmd;
+            cmdc.cmd = cmd;
+            return cmdc;
         }
         cmd.cmd = getOp(temp);
         if (cmd.cmd==1|| cmd.cmd == 0 || cmd.cmd == 2 || cmd.cmd == 4 || cmd.cmd == 5 || cmd.cmd == 3 )
@@ -180,7 +182,8 @@ commandCall parse(char *inp, int hasSign)
             {
                 cmd.error=INVALID;
                 // printf("3");
-                return cmd;
+                cmdc.cmd = cmd;
+                return cmdc;
             }
 
             if (is_valid_val(temp_param2))
@@ -195,16 +198,18 @@ commandCall parse(char *inp, int hasSign)
             {
                 cmd.error = INVALID;
                 // printf("4");
-                return cmd;
+                cmdc.cmd = cmd;
+                return cmdc;
             }
 
             if (cmd.type1!=cmd.type2)
             {
                 cmd.error = INVALID;
                 // printf("5");
-                return cmd;
+                cmdc.cmd = cmd;
+                return cmdc;
             }
-            cmd.target = encode_cell(temp_target);
+            cmdc.target = encode_cell(temp_target);
             if(cmd.type1) {
                 cmd.param1 = encode_cell(temp_param1);
             }
@@ -229,7 +234,9 @@ commandCall parse(char *inp, int hasSign)
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             // printf("6");
-            return cmd;
+            cmdc.cmd = cmd;
+
+            return cmdc;
         }
         cmd.type=FUNC;
         cmd.cmd = SLEEP;
@@ -245,9 +252,10 @@ commandCall parse(char *inp, int hasSign)
         {
             cmd.error = INVALID;
             // printf("7");
-            return cmd;
+            cmdc.cmd = cmd;
+            return cmdc;
         }
-        cmd.target = encode_cell(temp_target);
+        cmdc.target = encode_cell(temp_target);
             if(cmd.type1) {
                 cmd.param1 = encode_cell(temp_param1);
             }
@@ -261,7 +269,8 @@ commandCall parse(char *inp, int hasSign)
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             // printf("8");
-            return cmd;
+            cmdc.cmd = cmd;
+            return cmdc;
         }
         cmd.type = ART;
 
@@ -294,7 +303,8 @@ commandCall parse(char *inp, int hasSign)
         {
             cmd.error = INVALID;
             // printf("9");
-            return cmd;
+            cmdc.cmd = cmd;
+            return cmdc;
         }
 
         if (is_valid_val(temp_param2))
@@ -310,7 +320,8 @@ commandCall parse(char *inp, int hasSign)
         {
             cmd.error=INVALID;
             // printf("10");
-            return cmd;
+            cmdc.cmd = cmd;
+            return cmdc;
         }
 
         if (strcmp(sym1, "-") == 0)
@@ -319,12 +330,13 @@ commandCall parse(char *inp, int hasSign)
             {
                 cmd.error = INVALID;
                 // printf("11");
-                return cmd;
+                cmdc.cmd = cmd;
+                return cmdc;
             }
             strcat(sym1, temp_param1);
             strcpy(temp_param1, sym1);
         }
-        cmd.target = encode_cell(temp_target);
+        cmdc.target = encode_cell(temp_target);
             if(cmd.type1) {
                 cmd.param1 = encode_cell(temp_param1);
             }
@@ -344,7 +356,8 @@ commandCall parse(char *inp, int hasSign)
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             // printf("12");
-            return cmd;
+            cmdc.cmd = cmd;
+            return cmdc;
         }
         cmd.type = ART;
 
@@ -376,7 +389,8 @@ commandCall parse(char *inp, int hasSign)
         {
             cmd.error = INVALID;
             // printf("13");
-            return cmd;
+            cmdc.cmd = cmd;
+            return cmdc;
         }
 
         if (is_valid_val(temp_param2))
@@ -391,9 +405,10 @@ commandCall parse(char *inp, int hasSign)
         {
             cmd.error = INVALID;
             // printf("14");
-            return cmd;
+            cmdc.cmd = cmd;
+            return cmdc;
         }
-        cmd.target = encode_cell(temp_target);
+        cmdc.target = encode_cell(temp_target);
             if(cmd.type1) {
                 cmd.param1 = encode_cell(temp_param1);
             }
@@ -414,7 +429,8 @@ commandCall parse(char *inp, int hasSign)
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             // printf("15");
-            return cmd;
+            cmdc.cmd = cmd;
+            return cmdc;
         }
         cmd.type = VAL;
 // set
@@ -438,7 +454,7 @@ commandCall parse(char *inp, int hasSign)
         cmd.error = INVALID;
         // printf("17");
     }
-    cmd.target = encode_cell(temp_target);
+    cmdc.target = encode_cell(temp_target);
             if(cmd.type1) {
                 cmd.param1 = encode_cell(temp_param1);
             }
@@ -446,7 +462,7 @@ commandCall parse(char *inp, int hasSign)
                 cmd.param1 = atoi(temp_param1);
             }
 
-    return cmd;
+    return cmdc;
 }
 
 // operations
@@ -496,8 +512,8 @@ int maximumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr, c
     {
         for (int j = y1; j <= y2; j++)
         {
-            if(arr[i][j].isDivByZero){
-                tgt->isDivByZero=1;
+            if(arr[i][j].cmd.isDivByZero){
+                tgt->cmd.isDivByZero=1;
                 return 0;
             }
             if (max < arr[i][j].val)
@@ -515,8 +531,8 @@ int minimumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr, c
     {
         for (int j = y1; j <= y2; j++)
         {
-            if(arr[i][j].isDivByZero){
-                tgt->isDivByZero=1;
+            if(arr[i][j].cmd.isDivByZero){
+                tgt->cmd.isDivByZero=1;
                 return 0;
             }
             if (min > arr[i][j].val)
@@ -534,8 +550,8 @@ int sumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr, cell 
     {
         for (int j = y1; j <= y2; j++)
         {
-            if(arr[i][j].isDivByZero){
-                tgt->isDivByZero=1;
+            if(arr[i][j].cmd.isDivByZero){
+                tgt->cmd.isDivByZero=1;
                 return 0;
             }
             sum += arr[i][j].val;
@@ -557,8 +573,8 @@ int stdev(int x1, int y1, int x2, int y2, int row, int col, cell **arr, cell *tg
     {
         for (int j = y1; j <= y2; j++)
         {
-            if(arr[i][j].isDivByZero){
-                tgt->isDivByZero=1;
+            if(arr[i][j].cmd.isDivByZero){
+                tgt->cmd.isDivByZero=1;
                 return 0;
             }
             sum_of_sq+=(arr[i][j].val - mean)*(arr[i][j].val - mean);
@@ -635,7 +651,7 @@ void Display(int row, int col, cell **arr, int rowi, int coli)
         printf("%d\t", i + 1);
         for (int j = coli; j < coli + 10 && j < col; j++)
         {
-            if (arr[i][j].isDivByZero == 1)
+            if (arr[i][j].cmd.isDivByZero == 1)
             {
                 printf("ERR\t");
             }
@@ -804,7 +820,7 @@ void update(cell *tgt, cell **arr, int row, int col)
 {
     commandCall parsed_inp = tgt->cmd;
     // printf("updated %d\n",parsed_inp.target);
-    tgt->isDivByZero = 0;
+    tgt->cmd.isDivByZero = 0;
     if (parsed_inp.type== 0)
     {
         if (parsed_inp.type1== 0)
@@ -814,9 +830,9 @@ void update(cell *tgt, cell **arr, int row, int col)
         else
         {
             coordinate source1 = decode_cell(parsed_inp.param1);
-            if (arr[source1.x][source1.y].isDivByZero)
+            if (arr[source1.x][source1.y].cmd.isDivByZero)
             {
-                tgt->isDivByZero = 1;
+                tgt->cmd.isDivByZero = 1;
                 tgt->val = 0;
             }
             else
@@ -846,7 +862,7 @@ void update(cell *tgt, cell **arr, int row, int col)
                 {
                     if( (parsed_inp.param2)==0){
                         tgt->val = 0;
-                        tgt->isDivByZero = 1;
+                        tgt->cmd.isDivByZero = 1;
                     }
                     else{
                         tgt->val =  (parsed_inp.param1) /  (parsed_inp.param2);
@@ -870,7 +886,7 @@ void update(cell *tgt, cell **arr, int row, int col)
                 else
                 {
                     if(arr[source2.x][source2.y].val == 0){
-                        tgt->isDivByZero = 1;
+                        tgt->cmd.isDivByZero = 1;
                         tgt->val = 0;
                     }
                     else{
@@ -882,8 +898,8 @@ void update(cell *tgt, cell **arr, int row, int col)
         else
         {
             coordinate source1 = decode_cell(parsed_inp.param1);
-            if(arr[source1.x][source1.y].isDivByZero){
-                tgt->isDivByZero = 1;
+            if(arr[source1.x][source1.y].cmd.isDivByZero){
+                tgt->cmd.isDivByZero = 1;
                 tgt->val = 0;
             }
 
@@ -905,7 +921,7 @@ void update(cell *tgt, cell **arr, int row, int col)
                 {
                     if( (parsed_inp.param2)==0){
                         tgt->val = 0;
-                        tgt->isDivByZero = 1;
+                        tgt->cmd.isDivByZero = 1;
                     }
                     else{
                         tgt->val = arr[source1.x][source1.y].val /  (parsed_inp.param2);
@@ -916,8 +932,8 @@ void update(cell *tgt, cell **arr, int row, int col)
             {
                 coordinate source1 = decode_cell(parsed_inp.param1);
                 coordinate source2 = decode_cell(parsed_inp.param2);
-                if(arr[source2.x][source2.y].isDivByZero){
-                    tgt->isDivByZero = 1;
+                if(arr[source2.x][source2.y].cmd.isDivByZero){
+                    tgt->cmd.isDivByZero = 1;
                     tgt->val = 0;
                 }
                 if (parsed_inp.cmd== 0)
@@ -935,7 +951,7 @@ void update(cell *tgt, cell **arr, int row, int col)
                 else if (parsed_inp.cmd== 3)
                 {
                     if(arr[source2.x][source2.y].val == 0){
-                        tgt->isDivByZero = 1;
+                        tgt->cmd.isDivByZero = 1;
                         tgt->val = 0;
                     }
                     else{
@@ -945,7 +961,7 @@ void update(cell *tgt, cell **arr, int row, int col)
                 else
                 {
                     if(arr[source2.x][source2.y].val == 0){
-                        tgt->isDivByZero = 1;
+                        tgt->cmd.isDivByZero = 1;
                         tgt->val = 0;
                     }
                     else{

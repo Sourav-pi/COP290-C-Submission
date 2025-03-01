@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
             commandCall new_command = {
                 0,
             };
-            cell new_cell = {0,0, new_command, create_hashset()};
+            cell new_cell = {0, new_command, create_hashset()};
             arr[i][j] = new_cell;
         }
     }
@@ -86,6 +86,7 @@ int main(int argc, char *argv[])
     double time = 0.0;
     char status[20] = "ok";
     commandCall parsed_inp;
+    commandContainer command;
     coordinate tar_cod;
     cell *tar_cell;
     commandCall old;
@@ -108,7 +109,9 @@ int main(int argc, char *argv[])
         strcpy(status, "ok");
         sleep_time = 0.0;
 
-        parsed_inp = parse(raw_inp, isSigned(raw_inp));
+        command = parse(raw_inp, isSigned(raw_inp));
+        parsed_inp = command.cmd;
+
         // printf("error: %s\n",parsed_inp.error);
         // debug
         // if (debug)
@@ -140,7 +143,7 @@ int main(int argc, char *argv[])
         // save old start
         if (parsed_inp.type!=3)
         {
-            tar_cod = decode_cell(parsed_inp.target);
+            tar_cod = decode_cell(command.target);
             tar_cell = &arr[tar_cod.x][tar_cod.y];
 
             old = tar_cell->cmd;
@@ -154,7 +157,7 @@ int main(int argc, char *argv[])
                     for (int j = x1.y; j <= x2.y; j++)
                     {
                         cell *temp = &arr[i][j];
-                        remove_string(temp->dep, old.target);
+                        remove_string(temp->dep, command.target);
                     }
                 }
             }
@@ -164,13 +167,13 @@ int main(int argc, char *argv[])
                 {
                     old_cod_1 = decode_cell(old.param1);
                     old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
-                    remove_string(old_cell_1->dep, old.target);
+                    remove_string(old_cell_1->dep, command.target);
                 }
                 if (old.type2 == 1)
                 {
                     old_cod_2 = decode_cell(old.param2);
                     old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
-                    remove_string(old_cell_2->dep, old.target);
+                    remove_string(old_cell_2->dep, command.target);
                 }
             }
 
@@ -240,7 +243,7 @@ int main(int argc, char *argv[])
         }
         else if (parsed_inp.type== 2)
         {
-            coordinate c = decode_cell(parsed_inp.target);
+            coordinate c = decode_cell(command.target);
             cell *tgt = &arr[c.x][c.y];
             tgt->cmd = parsed_inp;
             if (parsed_inp.cmd==5)
@@ -259,7 +262,7 @@ int main(int argc, char *argv[])
                     sleep(sleep_time);
                     coordinate x1 = decode_cell(parsed_inp.param1);
                     cell *temp = &arr[x1.x][x1.y];
-                    insert(temp->dep, parsed_inp.target);
+                    insert(temp->dep, command.target);
                 }
             }
             else if (parsed_inp.cmd==1)
@@ -271,7 +274,7 @@ int main(int argc, char *argv[])
                     for (int j = x1.y; j <= x2.y; j++)
                     {
                         cell *temp = &arr[i][j];
-                        insert(temp->dep, parsed_inp.target);
+                        insert(temp->dep, command.target);
                     }
                 }
             }
@@ -285,7 +288,7 @@ int main(int argc, char *argv[])
                     for (int j = x1.y; j <= x2.y; j++)
                     {
                         cell *temp = &arr[i][j];
-                        insert(temp->dep, parsed_inp.target);
+                        insert(temp->dep, command.target);
                     }
                 }
             }
@@ -299,7 +302,7 @@ int main(int argc, char *argv[])
                     for (int j = x1.y; j <= x2.y; j++)
                     {
                         cell *temp = &arr[i][j];
-                        insert(temp->dep, parsed_inp.target);
+                        insert(temp->dep, command.target);
                     }
                 }
             }
@@ -313,7 +316,7 @@ int main(int argc, char *argv[])
                     for (int j = x1.y; j <= x2.y; j++)
                     {
                         cell *temp = &arr[i][j];
-                        insert(temp->dep, parsed_inp.target);
+                        insert(temp->dep, command.target);
                     }
                 }
             }
@@ -327,14 +330,14 @@ int main(int argc, char *argv[])
                     for (int j = x1.y; j <= x2.y; j++)
                     {
                         cell *temp = &arr[i][j];
-                        insert(temp->dep, parsed_inp.target);
+                        insert(temp->dep, command.target);
                     }
                 }
             }
         }
         else if (parsed_inp.type == 0)
         {
-            coordinate c = decode_cell(parsed_inp.target);
+            coordinate c = decode_cell(command.target);
             cell *tgt = &arr[c.x][c.y];
             tgt->cmd = parsed_inp;
             if (parsed_inp.type1 == 0)
@@ -345,25 +348,25 @@ int main(int argc, char *argv[])
             else
             {
                 coordinate source1 = decode_cell(parsed_inp.param1);
-                if (arr[source1.x][source1.y].isDivByZero)
+                if (arr[source1.x][source1.y].cmd.isDivByZero)
                 {
-                    tgt->isDivByZero = 1;
+                    tgt->cmd.isDivByZero = 1;
                     tgt->val = 0;
                     continue;
                 }
                 else
                 {
                     tgt->val = arr[source1.x][source1.y].val;
-                    tgt->isDivByZero = 0;
+                    tgt->cmd.isDivByZero = 0;
                 }
                 cell source1_cell = arr[source1.x][source1.y];
-                insert(source1_cell.dep, parsed_inp.target);
+                insert(source1_cell.dep, command.target);
                 // iterate_hashset(source1_cell.dep,print_element);
             }
         }
         else if (parsed_inp.type == 1)
         {
-            coordinate c = decode_cell(parsed_inp.target);
+            coordinate c = decode_cell(command.target);
             cell *tgt = &arr[c.x][c.y];
             tgt->cmd = parsed_inp;
             if (parsed_inp.type1== 0)
@@ -386,14 +389,14 @@ int main(int argc, char *argv[])
                     {
                         if ((parsed_inp.param2) == 0)
                         {
-                            tgt->isDivByZero = 1;
+                            tgt->cmd.isDivByZero = 1;
                             tgt->val = 0;
                             continue;
                         }
                         else
                         {
                             tgt->val =  (parsed_inp.param1) /  (parsed_inp.param2);
-                            tgt->isDivByZero = 0;
+                            tgt->cmd.isDivByZero = 0;
                         }
                     }
                     // else
@@ -405,16 +408,16 @@ int main(int argc, char *argv[])
                 {
                     coordinate source2 = decode_cell(parsed_inp.param2);
                     cell source2_cell = arr[source2.x][source2.y];
-                    insert(source2_cell.dep, parsed_inp.target);
-                    if (source2_cell.isDivByZero)
+                    insert(source2_cell.dep, command.target);
+                    if (source2_cell.cmd.isDivByZero)
                     {
-                        tgt->isDivByZero = 1;
+                        tgt->cmd.isDivByZero = 1;
                         tgt->val = 0;
                         continue;
                     }
                     else
                     {
-                        tgt->isDivByZero = 0;
+                        tgt->cmd.isDivByZero = 0;
 
                         if (parsed_inp.cmd == 0)
                         {
@@ -432,13 +435,13 @@ int main(int argc, char *argv[])
                         {
                             if (arr[source2.x][source2.y].val == 0)
                             {
-                                tgt->isDivByZero = 1;
+                                tgt->cmd.isDivByZero = 1;
                                 tgt->val = 0;
                                 continue;
                             }
                             else
                             {
-                                tgt->isDivByZero=0;
+                                tgt->cmd.isDivByZero=0;
                                 tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
                             }
                         }
@@ -453,19 +456,19 @@ int main(int argc, char *argv[])
             {
                 coordinate source1 = decode_cell(parsed_inp.param1);
                 cell source1_cell = arr[source1.x][source1.y];
-                insert(source1_cell.dep, parsed_inp.target);
+                insert(source1_cell.dep, command.target);
 
                 if (parsed_inp.type2== 0)
                 {
-                    if (source1_cell.isDivByZero)
+                    if (source1_cell.cmd.isDivByZero)
                     {
-                        tgt->isDivByZero = 1;
+                        tgt->cmd.isDivByZero = 1;
                         tgt->val = 0;
                         continue;
                     }
                     else
                     {
-                        tgt->isDivByZero = 0;
+                        tgt->cmd.isDivByZero = 0;
 
                         if (parsed_inp.cmd == 0)
                         {
@@ -483,13 +486,13 @@ int main(int argc, char *argv[])
                         {
                             if ( (parsed_inp.param2) == 0)
                             {
-                                tgt->isDivByZero = 1;
+                                tgt->cmd.isDivByZero = 1;
                                 tgt->val = 0;
                                 continue;
                             }
                             else
                             {
-                                tgt->isDivByZero = 0;
+                                tgt->cmd.isDivByZero = 0;
                                 tgt->val = arr[source1.x][source1.y].val /  (parsed_inp.param2);
                             }
                         }
@@ -504,16 +507,16 @@ int main(int argc, char *argv[])
                     coordinate source1 = decode_cell(parsed_inp.param1);
                     coordinate source2 = decode_cell(parsed_inp.param2);
                     cell source2_cell = arr[source2.x][source2.y];
-                    insert(source2_cell.dep, parsed_inp.target);
-                    if (source1_cell.isDivByZero || source2_cell.isDivByZero)
+                    insert(source2_cell.dep, command.target);
+                    if (source1_cell.cmd.isDivByZero || source2_cell.cmd.isDivByZero)
                     {
-                        tgt->isDivByZero = 1;
+                        tgt->cmd.isDivByZero = 1;
                         tgt->val = 0;
                         continue;
                     }
                     else
                     {
-                        tgt->isDivByZero = 0;
+                        tgt->cmd.isDivByZero = 0;
                         if ( parsed_inp.cmd == 0)
                         {
                             tgt->val = addition(source1.x, source1.y, source2.x, source2.y, row, col, arr);
@@ -530,13 +533,13 @@ int main(int argc, char *argv[])
                         {
                             if (arr[source2.x][source2.y].val == 0)
                             {
-                                tgt->isDivByZero = 1;
+                                tgt->cmd.isDivByZero = 1;
                                 tgt->val = 0;
                                 continue;
                             }
                             else
                             {
-                                tgt->isDivByZero = 0;
+                                tgt->cmd.isDivByZero = 0;
                                 tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
                             }
                         }
@@ -554,7 +557,7 @@ int main(int argc, char *argv[])
         {
 
             
-            Node* sorted_cell_names = topological_sort(parsed_inp.target, arr, row, col);
+            Node* sorted_cell_names = topological_sort(command.target, arr, row, col);
             Node* temp = sorted_cell_names;
             if (sorted_cell_names == NULL)
             {
@@ -570,7 +573,7 @@ int main(int argc, char *argv[])
                         {
                             // printf("i:%d,j:%d\n",i,j);
                             cell *temp = &arr[i][j];
-                            remove_string(temp->dep, parsed_inp.target);
+                            remove_string(temp->dep, command.target);
                         }
                     }
                 }
@@ -580,13 +583,13 @@ int main(int argc, char *argv[])
                     {
                         old_cod_1 = decode_cell(parsed_inp.param1);
                         old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
-                        remove_string(old_cell_1->dep, parsed_inp.target);
+                        remove_string(old_cell_1->dep, command.target);
                     }
                     if ( old.type2== 1)
                     {
                         old_cod_2 = decode_cell(parsed_inp.param2);
                         old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
-                        remove_string(old_cell_2->dep, parsed_inp.target);
+                        remove_string(old_cell_2->dep, command.target);
                     }
                 }
                 // if (debug)
@@ -602,7 +605,7 @@ int main(int argc, char *argv[])
                         for (int j = x1.y; j <= x2.y; j++)
                         {
                             cell *temp = &arr[i][j];
-                            insert(temp->dep, old.target);
+                            insert(temp->dep, command.target);
                         }
                     }
                 }
@@ -612,13 +615,13 @@ int main(int argc, char *argv[])
                     {
                         coordinate old_cod_1 = decode_cell(old.param1);
                         cell *old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
-                        insert(old_cell_1->dep, old.target);
+                        insert(old_cell_1->dep, command.target);
                     }
                     if (old.type2== 1)
                     {
                         coordinate old_cod_2 = decode_cell(old.param2);
                         cell *old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
-                        insert(old_cell_2->dep, old.target);
+                        insert(old_cell_2->dep, command.target);
                     }
                 }
             }
