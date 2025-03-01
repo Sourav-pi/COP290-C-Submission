@@ -49,13 +49,14 @@ void print_memory_usage()
 int main(int argc, char *argv[])
 {
     // if (debug)
-    //     printf("%lu\n", sizeof(cell));
+        // printf("%lu\n", sizeof(cell));
     // if (debug)
-    //     printf("%lu\n", sizeof(int));
+        // printf("%lu\n", sizeof(int));
     // if (debug)
-    //     printf("%lu\n", sizeof(HashSet));
+        // printf("%lu\n", sizeof(HashSet));
     // if (debug)
-    //     printf("%lu\n", sizeof(commandCall));
+        // printf("%lu\n", sizeof(commandCall));
+        // printf("%lu\n", sizeof(Node));
 
     coordinate disp_c = {0, 0};
     int is_disp = 1;
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
             commandCall new_command = {
                 0,
             };
-            cell new_cell = {0, new_command, create_hashset()};
+            cell new_cell = {0,0, new_command, create_hashset()};
             arr[i][j] = new_cell;
         }
     }
@@ -246,9 +247,9 @@ int main(int argc, char *argv[])
             {
                 if (parsed_inp.type1==0)
                 {
-                    sleep_time = max(0, atoi(parsed_inp.param1));
+                    sleep_time = max(0, parsed_inp.param1);
                     sleep(sleep_time);
-                    tgt->val = atoi(parsed_inp.param1);
+                    tgt->val =  (parsed_inp.param1);
                     tgt->dep = create_hashset();
                 }
                 else
@@ -338,7 +339,7 @@ int main(int argc, char *argv[])
             tgt->cmd = parsed_inp;
             if (parsed_inp.type1 == 0)
             {
-                tgt->val = atoi(parsed_inp.param1);
+                tgt->val =  (parsed_inp.param1);
                 // printf("vaLLl: ÷%d\n",tgt->val);
             }
             else
@@ -371,19 +372,19 @@ int main(int argc, char *argv[])
                 {
                     if (parsed_inp.cmd == 0)
                     {
-                        tgt->val = atoi(parsed_inp.param1) + atoi(parsed_inp.param2);
+                        tgt->val = (parsed_inp.param1) + (parsed_inp.param2);
                     }
                     else if (parsed_inp.cmd==1)
                     {
-                        tgt->val = atoi(parsed_inp.param1) - atoi(parsed_inp.param2);
+                        tgt->val = (parsed_inp.param1) - (parsed_inp.param2);
                     }
                     else if (parsed_inp.cmd== 2)
                     {
-                        tgt->val = atoi(parsed_inp.param1) * atoi(parsed_inp.param2);
+                        tgt->val = (parsed_inp.param1) * (parsed_inp.param2);
                     }
                     else if (parsed_inp.cmd == 3)
                     {
-                        if (atoi(parsed_inp.param2) == 0)
+                        if ((parsed_inp.param2) == 0)
                         {
                             tgt->isDivByZero = 1;
                             tgt->val = 0;
@@ -391,13 +392,13 @@ int main(int argc, char *argv[])
                         }
                         else
                         {
-                            tgt->val = atoi(parsed_inp.param1) / atoi(parsed_inp.param2);
+                            tgt->val =  (parsed_inp.param1) /  (parsed_inp.param2);
                             tgt->isDivByZero = 0;
                         }
                     }
                     // else
                     // {
-                    //     tgt->val = atoi(parsed_inp.param1) / atoi(parsed_inp.param2);
+                    //     tgt->val =  (parsed_inp.param1) /  (parsed_inp.param2);
                     // }
                 }
                 else
@@ -417,15 +418,15 @@ int main(int argc, char *argv[])
 
                         if (parsed_inp.cmd == 0)
                         {
-                            tgt->val = atoi(parsed_inp.param1) + arr[source2.x][source2.y].val;
+                            tgt->val =  (parsed_inp.param1) + arr[source2.x][source2.y].val;
                         }
                         else if (parsed_inp.cmd== 1)
                         {
-                            tgt->val = atoi(parsed_inp.param1) - arr[source2.x][source2.y].val;
+                            tgt->val =  (parsed_inp.param1) - arr[source2.x][source2.y].val;
                         }
                         else if (parsed_inp.cmd== 2)
                         {
-                            tgt->val = atoi(parsed_inp.param1) * arr[source2.x][source2.y].val;
+                            tgt->val =  (parsed_inp.param1) * arr[source2.x][source2.y].val;
                         }
                         else if (parsed_inp.cmd== 3)
                         {
@@ -438,13 +439,13 @@ int main(int argc, char *argv[])
                             else
                             {
                                 tgt->isDivByZero=0;
-                                tgt->val = atoi(parsed_inp.param1) / arr[source2.x][source2.y].val;
+                                tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
                             }
                         }
                     }
                     // else
                     // {
-                    //     tgt->val = atoi(parsed_inp.param1) / arr[source2.x][source2.y].val;
+                    //     tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
                     // }
                 }
             }
@@ -468,19 +469,19 @@ int main(int argc, char *argv[])
 
                         if (parsed_inp.cmd == 0)
                         {
-                            tgt->val = atoi(parsed_inp.param2) + arr[source1.x][source1.y].val;
+                            tgt->val =  (parsed_inp.param2) + arr[source1.x][source1.y].val;
                         }
                         else if (parsed_inp.cmd == 1)
                         {
-                            tgt->val = arr[source1.x][source1.y].val - atoi(parsed_inp.param2);
+                            tgt->val = arr[source1.x][source1.y].val -  (parsed_inp.param2);
                         }
                         else if (parsed_inp.cmd == 2)
                         {
-                            tgt->val = atoi(parsed_inp.param2) * arr[source1.x][source1.y].val;
+                            tgt->val =  (parsed_inp.param2) * arr[source1.x][source1.y].val;
                         }
                         else if (parsed_inp.cmd== 3)
                         {
-                            if (atoi(parsed_inp.param2) == 0)
+                            if ( (parsed_inp.param2) == 0)
                             {
                                 tgt->isDivByZero = 1;
                                 tgt->val = 0;
@@ -489,13 +490,13 @@ int main(int argc, char *argv[])
                             else
                             {
                                 tgt->isDivByZero = 0;
-                                tgt->val = arr[source1.x][source1.y].val / atoi(parsed_inp.param2);
+                                tgt->val = arr[source1.x][source1.y].val /  (parsed_inp.param2);
                             }
                         }
                     }
                     // else
                     // {
-                    //     tgt->val = atoi(parsed_inp.param2) / arr[source1.x][source1.y].val;
+                    //     tgt->val =  (parsed_inp.param2) / arr[source1.x][source1.y].val;
                     // }
                 }
                 else
@@ -536,13 +537,13 @@ int main(int argc, char *argv[])
                             else
                             {
                                 tgt->isDivByZero = 0;
-                                tgt->val = atoi(parsed_inp.param1) / arr[source2.x][source2.y].val;
+                                tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
                             }
                         }
                     }
                     // else
                     // {
-                    //     tgt->val = atoi(parsed_inp.param1) / arr[source2.x][source2.y].val;
+                    //     tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
                     // }
                 }
             }
@@ -551,7 +552,10 @@ int main(int argc, char *argv[])
         // printf("parsed_inp:\n");
         if (parsed_inp.type != 3)
         {
-            char **sorted_cell_names = topological_sort(parsed_inp.target, arr, row, col);
+
+            
+            Node* sorted_cell_names = topological_sort(parsed_inp.target, arr, row, col);
+            Node* temp = sorted_cell_names;
             if (sorted_cell_names == NULL)
             {
                 strcpy(status, "Circular dependency");
@@ -620,14 +624,20 @@ int main(int argc, char *argv[])
             }
             else
             {
-                for (int i = 0; sorted_cell_names[i] != NULL; i++)
+                while(sorted_cell_names!= NULL)
                 {
-                    coordinate c = decode_cell(sorted_cell_names[i]);
+                    // printf("sorted_cell_names:%d\n", sorted_cell_names->value);
+                    coordinate c = decode_cell(sorted_cell_names->value);
                     cell *cell_ptr = &arr[c.x][c.y];
                     // if (debug)
                     //     printf("%s ", sorted_cell_names[i]);
                     update(cell_ptr, arr, row, col);
-                    free(sorted_cell_names[i]);
+                    Node* temp = sorted_cell_names;
+                    sorted_cell_names = sorted_cell_names->next;
+
+                    
+                    free(temp);
+                    
                 }
                 // if (debug)
                 //     printf("\n");

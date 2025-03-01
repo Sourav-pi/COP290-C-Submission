@@ -42,24 +42,24 @@ typedef struct
      
     unsigned int type : 2;  // val, art, func, cmd    
     unsigned int cmd : 3;   // add, sub, mul, div, MIN, MAX, SUM, AVG, STDEV, SLEEP, scroll_to, disable_output, enable_output, w, d, a, s
+    unsigned int type1 : 1; // val, cell
+    unsigned int type2 : 1; // val, cell
+    unsigned int error : 2;
     // char target[7];
     int target;
     // char param1[7];         // any cell or value or "" 
     int param1;
-    unsigned int type1 : 1; // val, cell
     // char param2[7];         // any cell or value or ""
     int param2;
-    unsigned int type2 : 1; // val, cell
-    unsigned int error : 2;
 } commandCall;
 
 
 typedef struct
 {
     int val;
+    char isDivByZero;
     commandCall cmd;
     HashSet* dep;
-    unsigned int isDivByZero : 1;
 } cell;
 
 typedef struct 
@@ -80,7 +80,7 @@ coordinate convert_to_index(char *str);
 cell* create_new_cell() ;
 void free_cell(cell* c);
 void update(cell *tgt, cell **arr, int row, int col);
-char **topological_sort(char *cell_name, cell **arr, int row, int col);
+Node*topological_sort(int cell_name, cell **arr, int row, int col);
 int isSigned(char* inp);
 int encode_cell(char* cell_str);
 coordinate decode_cell(int cellcode);
