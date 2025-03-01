@@ -705,7 +705,7 @@ void free_cell(cell *c)
 //     return sorted_cell_names;
 // }
 
-int topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sorted_cells, int *index, cell **arr)
+int topological_sort_util(int v, HashSet *visited, HashSet *stack, char **sorted_cells, cell **arr)
 {
     // if (debug)
     //     printf("v:%s\n", v);
@@ -721,7 +721,7 @@ int topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sort
     {
         insert(visited, v);
         insert(stack, v);
-        coordinate dep_coord = convert_to_index(v);
+        coordinate dep_coord = decode_cell(v);
         cell *par = &arr[dep_coord.x][dep_coord.y];
         HashSet *set = par->dep;
         for (int i = 0; i < HASHSET_SIZE; i++)
@@ -730,7 +730,7 @@ int topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sort
             while (current)
             { // Traverse the linked list in each bucket
                 // callback(current->value);  // Call the callback function with the string
-                int x = topological_sort_util(current->value, visited, stack, sorted_cells, index, arr);
+                int x = topological_sort_util(current->value, visited, stack, sorted_cells, arr);
                 if (x == 1)
                 {
                     return 1;
@@ -740,16 +740,18 @@ int topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sort
         }
 
         remove_string(stack, v);
-        char *new_str = (char *)malloc(strlen(v) + 1);
-        strcpy(new_str, v);
-        sorted_cells[(*index)++] = new_str;
+        Node *new_str = (Node *)malloc(sizeof(Node));
+        // strcpy(new_str, v);
+        new_str->value=v;
+        new_str->next=sorted_cells;
+        sorted_cells=new_str;
     }
     return 0;
 }
 
-char **topological_sort(char *cell_name, cell **arr, int row, int col)
+char **topological_sort(int cell_name, cell **arr, int row, int col)
 {
-    coordinate coord = convert_to_index(cell_name);
+    coordinate coord = decode_cell(cell_name);
     cell *start = &arr[coord.x][coord.y];
 
     int total_cells = row * col;
@@ -758,16 +760,16 @@ char **topological_sort(char *cell_name, cell **arr, int row, int col)
 
     HashSet *stack = create_hashset();
 
-    char **sorted_cells = (char **)malloc(total_cells * sizeof(char *));
+    Node *sorted_cells = NULL;
 
-    if (sorted_cells == NULL)
-    {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
-    int index = 0;
+    // if (sorted_cells == NULL)
+    // {
+    //     fprintf(stderr, "Memory allocation failed\n");
+    //     exit(EXIT_FAILURE);
+    // }
+    // int index = 0;
 
-    int is_cycle = topological_sort_util(cell_name, visited, stack, sorted_cells, &index, arr);
+    int is_cycle = topological_sort_util(cell_name, visited, stack, sorted_cells, arr);
     if (is_cycle == 1)
     {
         return NULL;
@@ -779,12 +781,12 @@ char **topological_sort(char *cell_name, cell **arr, int row, int col)
     free_hashset(visited);
     free_hashset(stack);
 
-    for (int i = 0; i < index / 2; i++)
-    {
-        char *temp = sorted_cells[i];
-        sorted_cells[i] = sorted_cells[index - i - 1];
-        sorted_cells[index - i - 1] = temp;
-    }
+    // for (int i = 0; i < index / 2; i++)
+    // {
+    //     char *temp = sorted_cells[i];
+    //     sorted_cells[i] = sorted_cells[index - i - 1];
+    //     sorted_cells[index - i - 1] = temp;
+    // }
     // if (debug)
     // {
     //     printf("Sorted cells: ");
