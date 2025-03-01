@@ -461,7 +461,9 @@ commandContainer parse(char *inp, int hasSign)
             else{
                 cmd.param1 = atoi(temp_param1);
             }
-
+    // print cmdc formatted
+    // printf("cmdc.target:%d,cmdc.cmd.type:%d,cmdc.cmd.cmd:%d,cmdc.cmd.type1:%d,cmdc.cmd.type2:%d,cmdc.cmd.error:%d,cmdc.cmd.isDivByZero:%d,cmdc.cmd.param1:%d,cmdc.cmd.param2:%d\n",cmdc.target,cmdc.cmd.type,cmdc.cmd.cmd,cmdc.cmd.type1,cmdc.cmd.type2,cmdc.cmd.error,cmdc.cmd.isDivByZero,cmdc.cmd.param1,cmdc.cmd.param2);
+    cmdc.cmd = cmd;
     return cmdc;
 }
 
