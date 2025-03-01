@@ -5,22 +5,22 @@
 
 
 
-unsigned int hash(const char *str) {
-    const unsigned int FNV_prime = 16777619;  // FNV prime constant
-    const unsigned int offset_basis = 2166136261U;  // FNV offset basis
-    unsigned int hash = offset_basis;
+unsigned int hash(const int value) {
+    // const unsigned int FNV_prime = 16777619;  
+    // const unsigned int offset_basis = 2166136261U;  
+    // unsigned int hash = offset_basis;
 
-    while (*str) {
-        hash ^= (unsigned char)(*str++);  // XOR with the current character
-        hash *= FNV_prime;              // Multiply by the prime constant
-    }
+    // while (*str) {
+    //     hash ^= (unsigned char)(*str++);  
+    //     hash *= FNV_prime;             
+    // }
 
-    return hash % HASHSET_SIZE;  // Map hash to a bucket index
+    return value % HASHSET_SIZE;  
 }
 
 
 
-// Initialize the HashSet
+
 HashSet* create_hashset() {
     HashSet *set = (HashSet *)malloc(sizeof(HashSet));
     if (!set) {
@@ -33,23 +33,21 @@ HashSet* create_hashset() {
     return set;
 }
 
-// Check if a string exists in the HashSet
-int contains(HashSet *set, const char *value) {
+
+int contains(HashSet *set, const int value) {
     unsigned int index = hash(value);
     Node *current = set->buckets[index];
     while (current) {
-        if (strcmp(current->value, value) == 0) {
-            return 1;  // Found
+        if (current->value== value) {
+            return 1;  
         }
         current = current->next;
     }
-    return 0;  // Not found
+    return 0;  
 }
-
-// Insert a string into the HashSet
-void insert(HashSet *set, const char *value) {
+void insert(HashSet *set, const int value) {
     if (contains(set, value)) {
-        return;  // Already exists, no duplicates allowed
+        return; 
     }
 
     unsigned int index = hash(value);
@@ -58,37 +56,36 @@ void insert(HashSet *set, const char *value) {
         fprintf(stderr, "Memory allocation failed\n");
         exit(1);
     }
-    new_node->value = strdup(value);  // Duplicate the string
+    new_node->value = value;  
     new_node->next = set->buckets[index];
     set->buckets[index] = new_node;
 }
 
-void iterate_hashset(HashSet *set, void (*callback)(const char *)) {
-    for (int i = 0; i < HASHSET_SIZE; i++) {  // Loop through all buckets
+void iterate_hashset(HashSet *set, void (*callback)(int)) {
+    for (int i = 0; i < HASHSET_SIZE; i++) {  
         Node *current = set->buckets[i];
-        while (current) {  // Traverse the linked list in each bucket
-            callback(current->value);  // Call the callback function with the string
+        while (current) {  
+            callback(current->value);  
             current = current->next;
         }
     }
 }
 
 
-// Remove a string from the HashSet
-void remove_string(HashSet *set, const char *value) {
+void remove_string(HashSet *set, const int value) {
     unsigned int index = hash(value);
     Node *current = set->buckets[index];
     Node *prev = NULL;
 
     while (current) {
-        if (strcmp(current->value, value) == 0) {
+        if (current->value== value) {
             if (prev) {
                 prev->next = current->next;
             } else {
                 set->buckets[index] = current->next;
             }
-            free(current->value);  // Free the duplicated string
-            free(current);         // Free the node itself
+              
+            free(current);         
             return;
         }
         prev = current;
@@ -96,19 +93,56 @@ void remove_string(HashSet *set, const char *value) {
     }
 }
 
-// Free all memory used by the HashSet
 void free_hashset(HashSet *set) {
     for (int i = 0; i < HASHSET_SIZE; i++) {
         Node *current = set->buckets[i];
         while (current) {
             Node *temp = current;
             current = current->next;
-            free(temp->value);  // Free the duplicated string
-            free(temp);         // Free the node itself
+            free(temp);         
         }
     }
     free(set);
 }
-void print_string(const char *str) {
-    printf("%s ", str);
+void print_value(int a){
+    printf("%d ",a);
+}
+
+int main(){
+    HashSet *set = create_hashset();
+
+    // Test: Inserting values
+    insert(set, 10);
+    insert(set, 20);
+    insert(set, 30);
+    insert(set, 10);  // Duplicate
+    insert(set, 40);
+
+    printf("HashSet contains: ");
+    iterate_hashset(set, print_value);
+    printf("\n");
+
+    // Test: Contains function
+    printf("Contains 20: %s\n", contains(set, 20) ? "Yes" : "No");
+    printf("Contains 50: %s\n", contains(set, 50) ? "Yes" : "No");
+
+    // Test: Removing values
+    remove_string(set, 20);
+    printf("After removing 20: ");
+    iterate_hashset(set, print_value);
+    printf("\n");
+
+    remove_string(set, 50);  // Removing non-existent value
+    printf("After trying to remove 50 (non-existent): ");
+    iterate_hashset(set, print_value);
+    printf("\n");
+    printf("vishal\n");
+    // Test: Edge cases
+    // insert(set, -1);  // Negative value
+    insert(set, 0);   // Zero
+    printf("After inserting 0: ");
+    iterate_hashset(set, print_value);
+    printf("\n");
+
+    free_hashset(set);
 }
