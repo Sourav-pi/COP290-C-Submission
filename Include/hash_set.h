@@ -1,10 +1,10 @@
 #ifndef HASH_SET_H
 #define HASH_SET_H
 
-#define HASHSET_SIZE 1 // Number of buckets
+#define HASHSET_SIZE 10 // Number of buckets
 // Node structure for linked list
 typedef struct Node {
-    char *value;
+    int value;
     struct Node *next;
 } Node;
 
@@ -17,16 +17,16 @@ typedef struct HashSet {
 HashSet* create_hashset(void);
 
 // Check if a string exists in the HashSet
-int contains(HashSet *, const char *);
+int contains(HashSet *, int );
 
 // Insert a string into the HashSet
-void insert(HashSet *, const char *) ;
+void insert(HashSet *, const int) ;
 
-void iterate_hashset(HashSet *, void (*callback)(const char *)) ;
+void iterate_hashset(HashSet *, void (*callback)(int)) ;
 
 
 // Remove a string from the HashSet
-void remove_string(HashSet *, const char *);
+void remove_string(HashSet *, const int);
 
 // Free all memory used by the HashSet
 void free_hashset(HashSet *) ;
