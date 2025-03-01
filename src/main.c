@@ -161,13 +161,13 @@ int main(int argc, char *argv[])
             {
                 if (old.type1 == 1)
                 {
-                    old_cod_1 = convert_to_index(old.param1);
+                    old_cod_1 = decode_cell(old.param1);
                     old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
                     remove_string(old_cell_1->dep, old.target);
                 }
                 if (old.type2 == 1)
                 {
-                    old_cod_2 = convert_to_index(old.param2);
+                    old_cod_2 = decode_cell(old.param2);
                     old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
                     remove_string(old_cell_2->dep, old.target);
                 }
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
             // scroll_to not working
             if (parsed_inp.cmd==0)
             {
-                coordinate c = convert_to_index(parsed_inp.param1);
+                coordinate c = decode_cell(parsed_inp.param1);
                 // printf("%d %d\n",c.x,c.y);
                 if (c.x < row && c.y < col)
                 {
@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
         }
         else if (parsed_inp.type== 2)
         {
-            coordinate c = convert_to_index(parsed_inp.target);
+            coordinate c = decode_cell(parsed_inp.target);
             cell *tgt = &arr[c.x][c.y];
             tgt->cmd = parsed_inp;
             if (parsed_inp.cmd==5)
@@ -253,18 +253,18 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    coordinate source1 = convert_to_index(parsed_inp.param1);
+                    coordinate source1 = decode_cell(parsed_inp.param1);
                     sleep_time = max(arr[source1.x][source1.y].val, 0);
                     sleep(sleep_time);
-                    coordinate x1 = convert_to_index(parsed_inp.param1);
+                    coordinate x1 = decode_cell(parsed_inp.param1);
                     cell *temp = &arr[x1.x][x1.y];
                     insert(temp->dep, parsed_inp.target);
                 }
             }
             else if (parsed_inp.cmd==1)
             {
-                coordinate x1 = convert_to_index(parsed_inp.param1);
-                coordinate x2 = convert_to_index(parsed_inp.param2);
+                coordinate x1 = decode_cell(parsed_inp.param1);
+                coordinate x2 = decode_cell(parsed_inp.param2);
                 for (int i = x1.x; i <= x2.x; i++)
                 {
                     for (int j = x1.y; j <= x2.y; j++)
@@ -276,8 +276,8 @@ int main(int argc, char *argv[])
             }
             else if (parsed_inp.cmd==0)
             {
-                coordinate x1 = convert_to_index(parsed_inp.param1);
-                coordinate x2 = convert_to_index(parsed_inp.param2);
+                coordinate x1 = decode_cell(parsed_inp.param1);
+                coordinate x2 = decode_cell(parsed_inp.param2);
                 // tgt->val=minimumrange(x1.x,x1.y,x2.x,x2.y,row,col,arr);
                 for (int i = x1.x; i <= x2.x; i++)
                 {
@@ -290,8 +290,8 @@ int main(int argc, char *argv[])
             }
             else if (parsed_inp.cmd==2)
             {
-                coordinate x1 = convert_to_index(parsed_inp.param1);
-                coordinate x2 = convert_to_index(parsed_inp.param2);
+                coordinate x1 = decode_cell(parsed_inp.param1);
+                coordinate x2 = decode_cell(parsed_inp.param2);
                 // tgt->val=(additionrange(x1.x,x1.y,x2.x,x2.y,row,col,arr));
                 for (int i = x1.x; i <= x2.x; i++)
                 {
@@ -304,8 +304,8 @@ int main(int argc, char *argv[])
             }
             else if (parsed_inp.cmd==3)
             {
-                coordinate x1 = convert_to_index(parsed_inp.param1);
-                coordinate x2 = convert_to_index(parsed_inp.param2);
+                coordinate x1 = decode_cell(parsed_inp.param1);
+                coordinate x2 = decode_cell(parsed_inp.param2);
                 // tgt->val=(additionrange(x1.x,x1.y,x2.x,x2.y,row,col,arr))/2;
                 for (int i = x1.x; i <= x2.x; i++)
                 {
@@ -318,8 +318,8 @@ int main(int argc, char *argv[])
             }
             else if (parsed_inp.cmd == 4)
             {
-                coordinate x1 = convert_to_index(parsed_inp.param1);
-                coordinate x2 = convert_to_index(parsed_inp.param2);
+                coordinate x1 = decode_cell(parsed_inp.param1);
+                coordinate x2 = decode_cell(parsed_inp.param2);
                 // tgt->val=(additionrange(x1.x,x1.y,x2.x,x2.y,row,col,arr))/2;
                 for (int i = x1.x; i <= x2.x; i++)
                 {
@@ -333,7 +333,7 @@ int main(int argc, char *argv[])
         }
         else if (parsed_inp.type == 0)
         {
-            coordinate c = convert_to_index(parsed_inp.target);
+            coordinate c = decode_cell(parsed_inp.target);
             cell *tgt = &arr[c.x][c.y];
             tgt->cmd = parsed_inp;
             if (parsed_inp.type1 == 0)
@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                coordinate source1 = convert_to_index(parsed_inp.param1);
+                coordinate source1 = decode_cell(parsed_inp.param1);
                 if (arr[source1.x][source1.y].isDivByZero)
                 {
                     tgt->isDivByZero = 1;
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
         }
         else if (parsed_inp.type == 1)
         {
-            coordinate c = convert_to_index(parsed_inp.target);
+            coordinate c = decode_cell(parsed_inp.target);
             cell *tgt = &arr[c.x][c.y];
             tgt->cmd = parsed_inp;
             if (parsed_inp.type1== 0)
@@ -402,7 +402,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    coordinate source2 = convert_to_index(parsed_inp.param2);
+                    coordinate source2 = decode_cell(parsed_inp.param2);
                     cell source2_cell = arr[source2.x][source2.y];
                     insert(source2_cell.dep, parsed_inp.target);
                     if (source2_cell.isDivByZero)
@@ -450,7 +450,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                coordinate source1 = convert_to_index(parsed_inp.param1);
+                coordinate source1 = decode_cell(parsed_inp.param1);
                 cell source1_cell = arr[source1.x][source1.y];
                 insert(source1_cell.dep, parsed_inp.target);
 
@@ -500,8 +500,8 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    coordinate source1 = convert_to_index(parsed_inp.param1);
-                    coordinate source2 = convert_to_index(parsed_inp.param2);
+                    coordinate source1 = decode_cell(parsed_inp.param1);
+                    coordinate source2 = decode_cell(parsed_inp.param2);
                     cell source2_cell = arr[source2.x][source2.y];
                     insert(source2_cell.dep, parsed_inp.target);
                     if (source1_cell.isDivByZero || source2_cell.isDivByZero)
@@ -558,8 +558,8 @@ int main(int argc, char *argv[])
                 if (parsed_inp.type == 2)
                 {
                     // printf("XX2/n");
-                    coordinate x1 = convert_to_index(parsed_inp.param1);
-                    coordinate x2 = convert_to_index(parsed_inp.param2);
+                    coordinate x1 = decode_cell(parsed_inp.param1);
+                    coordinate x2 = decode_cell(parsed_inp.param2);
                     for (int i = x1.x; i <= x2.x; i++)
                     {
                         for (int j = x1.y; j <= x2.y; j++)
@@ -574,13 +574,13 @@ int main(int argc, char *argv[])
                 {
                     if (parsed_inp.type1 == 1)
                     {
-                        old_cod_1 = convert_to_index(parsed_inp.param1);
+                        old_cod_1 = decode_cell(parsed_inp.param1);
                         old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
                         remove_string(old_cell_1->dep, parsed_inp.target);
                     }
                     if ( old.type2== 1)
                     {
-                        old_cod_2 = convert_to_index(parsed_inp.param2);
+                        old_cod_2 = decode_cell(parsed_inp.param2);
                         old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
                         remove_string(old_cell_2->dep, parsed_inp.target);
                     }
@@ -591,8 +591,8 @@ int main(int argc, char *argv[])
                 tar_cell->val = old_val;
                 if (old.type == 2)
                 {
-                    coordinate x1 = convert_to_index(old.param1);
-                    coordinate x2 = convert_to_index(old.param2);
+                    coordinate x1 = decode_cell(old.param1);
+                    coordinate x2 = decode_cell(old.param2);
                     for (int i = x1.x; i <= x2.x; i++)
                     {
                         for (int j = x1.y; j <= x2.y; j++)
@@ -606,13 +606,13 @@ int main(int argc, char *argv[])
                 {
                     if (old.type1 == 1)
                     {
-                        coordinate old_cod_1 = convert_to_index(old.param1);
+                        coordinate old_cod_1 = decode_cell(old.param1);
                         cell *old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
                         insert(old_cell_1->dep, old.target);
                     }
                     if (old.type2== 1)
                     {
-                        coordinate old_cod_2 = convert_to_index(old.param2);
+                        coordinate old_cod_2 = decode_cell(old.param2);
                         cell *old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
                         insert(old_cell_2->dep, old.target);
                     }
@@ -622,7 +622,7 @@ int main(int argc, char *argv[])
             {
                 for (int i = 0; sorted_cell_names[i] != NULL; i++)
                 {
-                    coordinate c = convert_to_index(sorted_cell_names[i]);
+                    coordinate c = decode_cell(sorted_cell_names[i]);
                     cell *cell_ptr = &arr[c.x][c.y];
                     // if (debug)
                     //     printf("%s ", sorted_cell_names[i]);
