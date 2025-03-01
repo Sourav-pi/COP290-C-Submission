@@ -1,0 +1,30 @@
+ERRORS to FIX :
+++++++++++++++++++
+
+1. (FIXED)
+scroll_to AA100 not working
+scroll_to AA1 working
+
+1.1. (FIXED)
+add valid cell checking for non-largest sheet
+
+
+2. (FIXED)
+Once cycle is detetcted program stops responding to inputs
+
+3.
+reduce memory usage
+
+4. (FIXED)
+Handle -ve values input
+
+5. (FIXED)
+Handle division by zero
+
+6. (FIXED)
+Add division operator
+
+7. 
+Convert recursion to iteration
+
+A1=100/A1 Gives ERR rather than circular dependency

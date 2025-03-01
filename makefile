@@ -1,17 +1,17 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -IInclude
+# CFLAGS = -Wall -Wextra -IInclude -g
+CFLAGS = -IInclude -g
 
 SRCDIR = src
 INCDIR = Include
 OBJDIR = obj
-BINDIR = bin
 
-SOURCES = $(SRCDIR)/main.c $(SRCDIR)/module.c
+SOURCES = $(SRCDIR)/main.c $(SRCDIR)/module.c $(SRCDIR)/hash_set.c
 OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
-TARGET = $(BINDIR)/sheet
+TARGET = target/release/spreadsheet
 
 $(TARGET): $(OBJECTS)
-	@mkdir -p $(BINDIR)
+	echo $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
@@ -21,6 +21,6 @@ $(OBJDIR):
 	@mkdir -p $(OBJDIR)
 
 clean:
-	rm -rf $(OBJDIR) $(BINDIR)
+	rm -rf $(OBJDIR) $(TARGET)
 
 .PHONY: clean
