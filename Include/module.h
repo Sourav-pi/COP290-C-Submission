@@ -42,10 +42,13 @@ typedef struct
      
     unsigned int type : 2;  // val, art, func, cmd    
     unsigned int cmd : 3;   // add, sub, mul, div, MIN, MAX, SUM, AVG, STDEV, SLEEP, scroll_to, disable_output, enable_output, w, d, a, s
-    char target[7];
-    char param1[7];         // any cell or value or "" 
+    // char target[7];
+    int target;
+    // char param1[7];         // any cell or value or "" 
+    int param1;
     unsigned int type1 : 1; // val, cell
-    char param2[7];         // any cell or value or ""
+    // char param2[7];         // any cell or value or ""
+    int param2;
     unsigned int type2 : 1; // val, cell
     unsigned int error : 2;
 } commandCall;
@@ -79,6 +82,8 @@ void free_cell(cell* c);
 void update(cell *tgt, cell **arr, int row, int col);
 char **topological_sort(char *cell_name, cell **arr, int row, int col);
 int isSigned(char* inp);
+int encode_cell(char* cell_str);
+coordinate decode_cell(int cellcode);
 extern int rowmax ;
 extern int colmax ;
 

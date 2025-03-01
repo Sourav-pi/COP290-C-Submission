@@ -98,6 +98,9 @@ char temp[6];
 
 commandCall parse(char *inp, int hasSign)
 {
+    char temp_target[6];
+    char temp_param1[6];
+    char temp_param2[6];
     commandCall cmd = {0};
     char sym1[2];
     char sym2[2];
@@ -150,9 +153,9 @@ commandCall parse(char *inp, int hasSign)
         }
     }
     // Handle function commands
-    else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", cmd.target, temp, cmd.param1, cmd.param2) == 4)
+    else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", temp_target, temp, temp_param1, temp_param2) == 4)
     {
-        if(is_valid_cell(cmd.target)==0){
+        if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             return cmd;
         }
@@ -160,11 +163,11 @@ commandCall parse(char *inp, int hasSign)
         if (cmd.cmd==1|| cmd.cmd == 0 || cmd.cmd == 2 || cmd.cmd == 4 || cmd.cmd == 5 || cmd.cmd == 3 )
         {
             cmd.type = FUNC;
-            if (is_valid_val(cmd.param1))
+            if (is_valid_val(temp_param1))
             {
                 cmd.type1=VAL;
             }
-            else if (is_valid_cell(cmd.param1))
+            else if (is_valid_cell(temp_param1))
             {
                 cmd.type1=CELL;
             }
@@ -174,11 +177,11 @@ commandCall parse(char *inp, int hasSign)
                 return cmd;
             }
 
-            if (is_valid_val(cmd.param2))
+            if (is_valid_val(temp_param2))
             {
                 cmd.type2=VAL;
             }
-            else if (is_valid_cell(cmd.param2))
+            else if (is_valid_cell(temp_param2))
             {
                 cmd.type2=CELL;
             }
@@ -193,37 +196,43 @@ commandCall parse(char *inp, int hasSign)
                 cmd.error = INVALID;
                 return cmd;
             }
+            cmd.target = encode_cell(temp_target);
+            cmd.param1 = encode_cell(temp_param1);
+            cmd.param2 = encode_cell(temp_param2);
         }
         else
         {
             cmd.error = INVALID;
         }
     }
-    else if (sscanf(inp, "%[^=]=SLEEP(%[^)])", cmd.target, cmd.param1) == 2)
+    else if (sscanf(inp, "%[^=]=SLEEP(%[^)])", temp_target, temp_param1) == 2)
     {
-        if(is_valid_cell(cmd.target)==0){
+        if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             return cmd;
         }
         cmd.type=FUNC;
         cmd.cmd = SLEEP;
-        if (is_valid_val(cmd.param1))
+        if (is_valid_val(temp_param1))
         {
             cmd.type1=VAL;
         }
-        else if (is_valid_cell(cmd.param1))
+        else if (is_valid_cell(temp_param1))
         {
             cmd.type1=CELL;
         }
         else
         {
             cmd.error = INVALID;
+            return cmd;
         }
+        cmd.target = encode_cell(temp_target);
+        cmd.param1 = encode_cell(temp_param1);
     }
     // Handle arithmetic commands
-    else if (hasSign && sscanf(inp, "%[^=]=%[-+]%[^+-*/]%1[+-*/]%s", cmd.target, sym1, cmd.param1, temp, cmd.param2) == 5)
+    else if (hasSign && sscanf(inp, "%[^=]=%[-+]%[^+-*/]%1[+-*/]%s", temp_target, sym1, temp_param1, temp, temp_param2) == 5)
     {
-        if(is_valid_cell(cmd.target)==0){
+        if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             return cmd;
         }
@@ -245,11 +254,11 @@ commandCall parse(char *inp, int hasSign)
             break;
         }
 
-        if (is_valid_val(cmd.param1))
+        if (is_valid_val(temp_param1))
         {
             cmd.type1=VAL;
         }
-        else if (is_valid_cell(cmd.param1))
+        else if (is_valid_cell(temp_param1))
         {
             cmd.type1=CELL;
 
@@ -260,12 +269,12 @@ commandCall parse(char *inp, int hasSign)
             return cmd;
         }
 
-        if (is_valid_val(cmd.param2))
+        if (is_valid_val(temp_param2))
         {
             cmd.type2=VAL;
             
         }
-        else if (is_valid_cell(cmd.param2))
+        else if (is_valid_cell(temp_param2))
         {
             cmd.type2=CELL;
         }
@@ -282,13 +291,16 @@ commandCall parse(char *inp, int hasSign)
                 cmd.error = INVALID;
                 return cmd;
             }
-            strcat(sym1, cmd.param1);
-            strcpy(cmd.param1, sym1);
+            strcat(sym1, temp_param1);
+            strcpy(temp_param1, sym1);
         }
+        cmd.target = encode_cell(temp_target);
+        cmd.param1 = encode_cell(temp_param1);
+        cmd.param2 = encode_cell(temp_param2);
     }
-    else if (!hasSign && sscanf(inp, "%[^=]=%[^+-*/]%1[+-*/]%s", cmd.target, cmd.param1, temp, cmd.param2) == 4)
+    else if (!hasSign && sscanf(inp, "%[^=]=%[^+-*/]%1[+-*/]%s", temp_target, temp_param1, temp, temp_param2) == 4)
     {
-        if(is_valid_cell(cmd.target)==0){
+        if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             return cmd;
         }
@@ -310,11 +322,11 @@ commandCall parse(char *inp, int hasSign)
             break;
         }
 
-        if (is_valid_val(cmd.param1))
+        if (is_valid_val(temp_param1))
         {
             cmd.type1 = VAL;
         }
-        else if (is_valid_cell(cmd.param1))
+        else if (is_valid_cell(temp_param1))
         {
             cmd.type1 = CELL;
         }
@@ -324,11 +336,11 @@ commandCall parse(char *inp, int hasSign)
             return cmd;
         }
 
-        if (is_valid_val(cmd.param2))
+        if (is_valid_val(temp_param2))
         {
             cmd.type2 = VAL;
         }
-        else if (is_valid_cell(cmd.param2))
+        else if (is_valid_cell(temp_param2))
         {
             cmd.type2 = CELL;
         }
@@ -337,22 +349,25 @@ commandCall parse(char *inp, int hasSign)
             cmd.error = INVALID;
             return cmd;
         }
+        cmd.target = encode_cell(temp_target);
+        cmd.param1 = encode_cell(temp_param1);
+        cmd.param2 = encode_cell(temp_param2);
     }
 
     // Handle simple value/cell assignment
-    else if (sscanf(inp, "%[^=]=%s", cmd.target, cmd.param1) == 2)
+    else if (sscanf(inp, "%[^=]=%s", temp_target, temp_param1) == 2)
     {
-        if(is_valid_cell(cmd.target)==0){
+        if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             return cmd;
         }
         cmd.type = VAL;
 // set
-        if (is_valid_val(cmd.param1))
+        if (is_valid_val(temp_param1))
         {
             cmd.type1 = VAL;
         }
-        else if (is_valid_cell(cmd.param1))
+        else if (is_valid_cell(temp_param1))
         {
             cmd.type1 = CELL;
         
@@ -366,6 +381,8 @@ commandCall parse(char *inp, int hasSign)
     {
         cmd.error = INVALID;
     }
+    cmd.target = encode_cell(temp_target);
+    cmd.param1 = encode_cell(temp_param1);
 
     return cmd;
 }
@@ -626,94 +643,11 @@ void free_cell(cell *c)
     free_hashset(c->dep);
     free(c);
 }
-// coordinate cell_name_to_coordinates(const char *cell_name) {
-//     coordinate coord = {0, 0};
-//     int len = strlen(cell_name);
-//     int i = 0;
-
-//     // Extract column part (letters)
-//     while (i < len && isalpha(cell_name[i])) {
-//         coord.y = coord.y * 26 + (toupper(cell_name[i]) - 'A' + 1);
-//         i++;
-//     }
-//     coord.y--; // Convert to 0-based index
-
-//     // Extract row part (numbers)
-//     while (i < len && isdigit(cell_name[i])) {
-//         coord.x = coord.x * 10 + (cell_name[i] - '0');
-//         i++;
-//     }
-//     coord.x--; // Convert to 0-based index
-
-//     return coord;
-// }
-
-// void topological_sort_util(cell* v, HashSet* visited, HashSet* stack, cell** sorted_cells, int* index) {
-//     if (hash_set_contains(stack, v)) {
-//         fprintf(stderr, "Cycle detected in the graph\n");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     if (!hash_set_contains(visited, v)) {
-//         hash_set_add(visited, v);
-//         hash_set_add(stack, v);
-
-//         void callback(const char* dep_name) {
-//             coordinate dep_coord = convert_to_index((char*)dep_name);
-//             cell* child = &arr[dep_coord.x][dep_coord.y];
-//             topological_sort_util(child, visited, stack, sorted_cells, index);
-//         };
-//         iterate_hashset(v->dep, callback);
-
-//         remove_string(stack, v);
-//         sorted_cells[(*index)++] = v;
-//     }
-// }
-
-// char** topological_sort(char* cell_name, cell** arr) {
-//     coordinate coord = convert_to_index(cell_name);
-//     cell* start = &arr[coord.x][coord.y];
-
-//     int total_cells = 0;
-//     for (int i = 0; arr[i] != NULL; i++) {
-//         for (int j = 0; arr[i][j].val != -1; j++) {
-//             total_cells++;
-//         }
-//     }
-
-//     HashSet* visited = create_hashset();
-//     HashSet* stack = create_hashset();
-//     cell** sorted_cells = (cell**)malloc(total_cells * sizeof(cell*));
-//     if (sorted_cells == NULL) {
-//         fprintf(stderr, "Memory allocation failed\n");
-//         exit(EXIT_FAILURE);
-//     }
-//     int index = 0;
-
-//     topological_sort_util(start, visited, stack, sorted_cells, &index);
-
-//     char** sorted_cell_names = (char**)malloc((index + 1) * sizeof(char*));
-//     for (int i = 0; i < index; i++) {
-//         sorted_cell_names[i] = sorted_cells[i]->cmd.target;
-//     }
-//     sorted_cell_names[index] = NULL;
-
-//     free(sorted_cells);
-//     free_hashset(visited);
-//     free_hashset(stack);
-
-//     return sorted_cell_names;
-// }
 
 int topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sorted_cells, int *index, cell **arr)
 {
-    // if (debug)
-    //     printf("v:%s\n", v);
-
     if (contains(stack, v))
     {
-        // if (debug)
-        //     printf("Vishal\n");
         return 1;
     }
 
@@ -808,7 +742,7 @@ void update(cell *tgt, cell **arr, int row, int col)
         }
         else
         {
-            coordinate source1 = convert_to_index(parsed_inp.param1);
+            coordinate source1 = decode_cell(parsed_inp.param1);
             if (arr[source1.x][source1.y].isDivByZero)
             {
                 tgt->isDivByZero = 1;
@@ -850,7 +784,7 @@ void update(cell *tgt, cell **arr, int row, int col)
             }
             else
             {
-                coordinate source2 = convert_to_index(parsed_inp.param2);
+                coordinate source2 = decode_cell(parsed_inp.param2);
                 if (parsed_inp.cmd== 0)
                 {
                     tgt->val = atoi(parsed_inp.param1) + arr[source2.x][source2.y].val;
@@ -876,7 +810,7 @@ void update(cell *tgt, cell **arr, int row, int col)
         }
         else
         {
-            coordinate source1 = convert_to_index(parsed_inp.param1);
+            coordinate source1 = decode_cell(parsed_inp.param1);
             if(arr[source1.x][source1.y].isDivByZero){
                 tgt->isDivByZero = 1;
                 tgt->val = 0;
@@ -884,7 +818,7 @@ void update(cell *tgt, cell **arr, int row, int col)
 
             if (parsed_inp.type2== 0)
             {
-                coordinate source1 = convert_to_index(parsed_inp.param1);
+                coordinate source1 = decode_cell(parsed_inp.param1);
                 if (parsed_inp.cmd== 0)
                 {
                     tgt->val = atoi(parsed_inp.param2) + arr[source1.x][source1.y].val;
@@ -909,8 +843,8 @@ void update(cell *tgt, cell **arr, int row, int col)
             }
             else
             {
-                coordinate source1 = convert_to_index(parsed_inp.param1);
-                coordinate source2 = convert_to_index(parsed_inp.param2);
+                coordinate source1 = decode_cell(parsed_inp.param1);
+                coordinate source2 = decode_cell(parsed_inp.param2);
                 if(arr[source2.x][source2.y].isDivByZero){
                     tgt->isDivByZero = 1;
                     tgt->val = 0;
@@ -954,39 +888,39 @@ void update(cell *tgt, cell **arr, int row, int col)
     {
         if (parsed_inp.cmd== 1)
         {
-            coordinate x1 = convert_to_index(parsed_inp.param1);
-            coordinate x2 = convert_to_index(parsed_inp.param2);
+            coordinate x1 = decode_cell(parsed_inp.param1);
+            coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (maximumrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
         else if (parsed_inp.cmd== 0)
         {
-            coordinate x1 = convert_to_index(parsed_inp.param1);
-            coordinate x2 = convert_to_index(parsed_inp.param2);
+            coordinate x1 = decode_cell(parsed_inp.param1);
+            coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (minimumrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
         else if (parsed_inp.cmd== 2)
         {
-            coordinate x1 = convert_to_index(parsed_inp.param1);
-            coordinate x2 = convert_to_index(parsed_inp.param2);
+            coordinate x1 = decode_cell(parsed_inp.param1);
+            coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (sumrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
         else if (parsed_inp.cmd== 3)
         {
-            coordinate x1 = convert_to_index(parsed_inp.param1);
-            coordinate x2 = convert_to_index(parsed_inp.param2);
+            coordinate x1 = decode_cell(parsed_inp.param1);
+            coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (avgrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
         else if (parsed_inp.cmd== 4)
         {
-            coordinate x1 = convert_to_index(parsed_inp.param1);
-            coordinate x2 = convert_to_index(parsed_inp.param2);
+            coordinate x1 = decode_cell(parsed_inp.param1);
+            coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (stdev(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
         else if (parsed_inp.cmd== 5)
         {
             if (parsed_inp.type1 != 0)
             {
-                coordinate source1 = convert_to_index(parsed_inp.param1);
+                coordinate source1 = decode_cell(parsed_inp.param1);
                 tgt->val = arr[source1.x][source1.y].val;
             }
         }

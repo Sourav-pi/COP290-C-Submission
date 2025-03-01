@@ -139,15 +139,15 @@ int main(int argc, char *argv[])
         // save old start
         if (parsed_inp.type!=3)
         {
-            tar_cod = convert_to_index(parsed_inp.target);
+            tar_cod = decode_cell(parsed_inp.target);
             tar_cell = &arr[tar_cod.x][tar_cod.y];
 
             old = tar_cell->cmd;
             old_val = tar_cell->val;
             if (old.type == 2)
             {
-                coordinate x1 = convert_to_index(old.param1);
-                coordinate x2 = convert_to_index(old.param2);
+                coordinate x1 = decode_cell(old.param1);
+                coordinate x2 = decode_cell(old.param2);
                 for (int i = x1.x; i <= x2.x; i++)
                 {
                     for (int j = x1.y; j <= x2.y; j++)
