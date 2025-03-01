@@ -4,6 +4,8 @@
 #include <ctype.h>
 #include "../Include/module.h"
 #include "../Include/hash_set.h"
+#include <math.h>
+#define debug 0
 
 // reverse a string in place
 void rev(char *s)
@@ -21,27 +23,67 @@ void rev(char *s)
     }
 }
 
+int getOp(char* inp){
+    if(strcmp(inp, "add") == 0) return ADD;
+    if(strcmp(inp, "sub") == 0) return SUB;
+    if(strcmp(inp, "mul") == 0) return MUL;
+    if(strcmp(inp, "div") == 0) return DIV;
+    if(strcmp(inp, "MAX") == 0) return MAX;
+    if(strcmp(inp, "MIN") == 0) return MIN;
+    if(strcmp(inp, "SUM") == 0) return SUM;
+    if(strcmp(inp, "AVG") == 0) return AVG;
+    if(strcmp(inp, "STDEV") == 0) return STDEV;
+    if(strcmp(inp, "SLEEP") == 0) return SLEEP;
+    return -1;
+}
+
 // checks if the cell is valid
-int is_valid_cell(const char *str)
+int is_valid_cell(char *str)
 {
     int len = strlen(str);
     if (len < 2 || len > 6)
+    {
         return 0;
+    }
     int i = 0;
     while (i < len && str[i] >= 'A' && str[i] <= 'Z')
+    {
         i++;
+    }
     if (i < 1 || i > 3)
+    {
         return 0;
+    }
+    int st = i;
     while (i < len && str[i] >= '0' && str[i] <= '9')
+    {
+
         i++;
-    if (i - (len - i) < 1 || i - (len - i) > 3)
+    }
+    if (i - st < 1 || i - st > 3)
+    {
         return 0;
-    return i == len;
+    }
+    if(i == len){
+        coordinate c = convert_to_index(str);
+        if(c.x >= rowmax || c.y >= colmax){
+            return 0;
+        }
+        else{
+            return 1;
+        }
+    }
+    return 0;
+
 }
 
 // checks if the value is valid (number in string form)
 int is_valid_val(char *str)
 {
+    if (*str == '-' || *str == '+')
+    {
+        str++;
+    }
     while (*str)
     {
         if (!isdigit(*str))
@@ -52,162 +94,277 @@ int is_valid_val(char *str)
 }
 
 // parses the input and returns the commandCall structure
-commandCall parse(char *inp)
+char temp[6];
+
+commandCall parse(char *inp, int hasSign)
 {
     commandCall cmd = {0};
-    printf("inp:%s\n", inp);
+    char sym1[2];
+    char sym2[2];
+
     // Handle simple commands
-    if (strcmp(inp, "disable_output") == 0 || strcmp(inp, "enable_output") == 0 || strcmp(inp, "w") == 0 || strcmp(inp, "d") == 0 || strcmp(inp, "a") == 0 || strcmp(inp, "s") == 0)
+    if (strcmp(inp, "disable_output") == 0 )
     {
-        strcpy(cmd.type, "cmd");
-        strcpy(cmd.cmd, inp);
+        cmd.type = CMD;
+        cmd.cmd = DISABLE_OUTPUT;
     }
+    else if (strcmp(inp, "enable_output") == 0)
+    {
+        cmd.type = CMD;
+        cmd.cmd = ENABLE_OUTPUT;
+
+    }
+    else if ( strcmp(inp, "w") == 0)
+    {
+        cmd.type = CMD;
+        cmd.cmd = W;
+    }
+    else if (strcmp(inp, "d") == 0 )
+    {
+        cmd.type = CMD;
+        cmd.cmd = D;
+    }
+    else if ( strcmp(inp, "a") == 0 )
+    {
+        cmd.type = CMD;
+        cmd.cmd = A;
+    }
+    else if (strcmp(inp, "s") == 0)
+    {
+        cmd.type = CMD;
+        cmd.cmd = S;
+    }
+
     else if (sscanf(inp, "scroll_to %s", cmd.param1) == 1)
     {
-        strcpy(cmd.type, "cmd");
-        strcpy(cmd.cmd, "scroll_to");
+        cmd.type = CMD;
+        cmd.cmd = SCROLL_TO;
         if (is_valid_cell(cmd.param1))
         {
-            strcpy(cmd.type1, "cell");
+            cmd.type1 = CELL;
+
         }
         else
         {
-            strcpy(cmd.error, "Invalid");
+            cmd.error = INVALID;
         }
     }
-
     // Handle function commands
-    else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", cmd.target, cmd.cmd, cmd.param1, cmd.param2) == 4)
+    else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", cmd.target, temp, cmd.param1, cmd.param2) == 4)
     {
-        printf("x1");
-        if (strcmp(cmd.cmd, "MAX") == 0 || strcmp(cmd.cmd, "MIN") == 0 ||
-            strcmp(cmd.cmd, "SUM") == 0 || strcmp(cmd.cmd, "AVG") == 0 ||
-            strcmp(cmd.cmd, "STDEV") == 0 || strcmp(cmd.cmd, "SLEEP") == 0)
+        if(is_valid_cell(cmd.target)==0){
+            cmd.error = INVALID;
+            return cmd;
+        }
+        cmd.cmd = getOp(temp);
+        if (cmd.cmd==1|| cmd.cmd == 0 || cmd.cmd == 2 || cmd.cmd == 4 || cmd.cmd == 5 || cmd.cmd == 3 )
         {
-            strcpy(cmd.type, "func");
+            cmd.type = FUNC;
             if (is_valid_val(cmd.param1))
             {
-                strcpy(cmd.type1, "val");
+                cmd.type1=VAL;
             }
             else if (is_valid_cell(cmd.param1))
             {
-                strcpy(cmd.type1, "cell");
+                cmd.type1=CELL;
             }
             else
             {
-                strcpy(cmd.error, "Invalid");
+                cmd.error=INVALID;
                 return cmd;
             }
 
             if (is_valid_val(cmd.param2))
             {
-                strcpy(cmd.type2, "val");
+                cmd.type2=VAL;
             }
             else if (is_valid_cell(cmd.param2))
             {
-                strcpy(cmd.type2, "cell");
+                cmd.type2=CELL;
             }
             else
             {
-                strcpy(cmd.error, "Invalid");
+                cmd.error = INVALID;
                 return cmd;
             }
 
-            if (strcmp(cmd.type1, cmd.type2) != 0)
+            if (cmd.type1!=cmd.type2)
             {
-                strcpy(cmd.error, "typeERR");
+                cmd.error = INVALID;
                 return cmd;
             }
         }
         else
         {
-            strcpy(cmd.error, "UnkCmd");
+            cmd.error = INVALID;
         }
     }
-    // else if (sscanf(inp, "%[^=]=SLEEP(%[^)])", cmd.target ,cmd.param1) == 1)
-    // {
-    //     strcpy(cmd.type, "func");
-    //     strcpy(cmd.cmd, "SLEEP");
-    //     if (is_valid_val(cmd.param1))
-    //     {
-    //         strcpy(cmd.type1, "val");
-    //     }
-    //     else
-    //     {
-    //         strcpy(cmd.error, "Invalid");
-    //     }
-    // }
-    // Handle arithmetic commands
-    else if (sscanf(inp, "%[^=]=%[^+-*/]%[+-*/]%s", cmd.target, cmd.param1, cmd.cmd, cmd.param2) == 4)
+    else if (sscanf(inp, "%[^=]=SLEEP(%[^)])", cmd.target, cmd.param1) == 2)
     {
-        strcpy(cmd.type, "art");
+        if(is_valid_cell(cmd.target)==0){
+            cmd.error = INVALID;
+            return cmd;
+        }
+        cmd.type=FUNC;
+        cmd.cmd = SLEEP;
+        if (is_valid_val(cmd.param1))
+        {
+            cmd.type1=VAL;
+        }
+        else if (is_valid_cell(cmd.param1))
+        {
+            cmd.type1=CELL;
+        }
+        else
+        {
+            cmd.error = INVALID;
+        }
+    }
+    // Handle arithmetic commands
+    else if (hasSign && sscanf(inp, "%[^=]=%[-+]%[^+-*/]%1[+-*/]%s", cmd.target, sym1, cmd.param1, temp, cmd.param2) == 5)
+    {
+        if(is_valid_cell(cmd.target)==0){
+            cmd.error = INVALID;
+            return cmd;
+        }
+        cmd.type = ART;
 
-        switch (cmd.cmd[0])
+        switch (temp[0])
         {
         case '+':
-            strcpy(cmd.cmd, "add");
+            cmd.cmd=ADD;
             break;
         case '-':
-            strcpy(cmd.cmd, "sub");
+            cmd.cmd = SUB;
             break;
         case '*':
-            strcpy(cmd.cmd, "mul");
+            cmd.cmd = MUL;
             break;
         case '/':
-            strcpy(cmd.cmd, "div");
+            cmd.cmd = DIV;
             break;
         }
 
         if (is_valid_val(cmd.param1))
         {
-            strcpy(cmd.type1, "val");
+            cmd.type1=VAL;
         }
         else if (is_valid_cell(cmd.param1))
         {
-            strcpy(cmd.type1, "cell");
+            cmd.type1=CELL;
+
         }
         else
         {
-            strcpy(cmd.error, "Invalid");
+            cmd.error = INVALID;
             return cmd;
         }
 
         if (is_valid_val(cmd.param2))
         {
-            strcpy(cmd.type2, "val");
+            cmd.type2=VAL;
+            
         }
         else if (is_valid_cell(cmd.param2))
         {
-            strcpy(cmd.type2, "cell");
+            cmd.type2=CELL;
         }
         else
         {
-            strcpy(cmd.error, "Invalid");
+            cmd.error=INVALID;
             return cmd;
         }
+
+        if (strcmp(sym1, "-") == 0)
+        {
+            if (cmd.type1!=0)
+            {
+                cmd.error = INVALID;
+                return cmd;
+            }
+            strcat(sym1, cmd.param1);
+            strcpy(cmd.param1, sym1);
+        }
     }
-    // Handle simple value/cell assignment
-    else if (sscanf(inp, "%[^=]=%s", cmd.target, cmd.param1) == 2)
+    else if (!hasSign && sscanf(inp, "%[^=]=%[^+-*/]%1[+-*/]%s", cmd.target, cmd.param1, temp, cmd.param2) == 4)
     {
-        strcpy(cmd.type, "val");
-        strcpy(cmd.cmd, "set");
+        if(is_valid_cell(cmd.target)==0){
+            cmd.error = INVALID;
+            return cmd;
+        }
+        cmd.type = ART;
+
+        switch (temp[0])
+        {
+        case '+':
+            cmd.cmd = ADD;
+            break;
+        case '-':
+            cmd.cmd = SUB;
+            break;
+        case '*':
+            cmd.cmd = MUL;
+            break;
+        case '/':
+            cmd.cmd = DIV;
+            break;
+        }
 
         if (is_valid_val(cmd.param1))
         {
-            strcpy(cmd.type1, "val");
+            cmd.type1 = VAL;
         }
         else if (is_valid_cell(cmd.param1))
         {
-            strcpy(cmd.type1, "cell");
+            cmd.type1 = CELL;
         }
         else
         {
-            strcpy(cmd.error, "Invalid");
+            cmd.error = INVALID;
+            return cmd;
+        }
+
+        if (is_valid_val(cmd.param2))
+        {
+            cmd.type2 = VAL;
+        }
+        else if (is_valid_cell(cmd.param2))
+        {
+            cmd.type2 = CELL;
+        }
+        else
+        {
+            cmd.error = INVALID;
+            return cmd;
+        }
+    }
+
+    // Handle simple value/cell assignment
+    else if (sscanf(inp, "%[^=]=%s", cmd.target, cmd.param1) == 2)
+    {
+        if(is_valid_cell(cmd.target)==0){
+            cmd.error = INVALID;
+            return cmd;
+        }
+        cmd.type = VAL;
+// set
+        if (is_valid_val(cmd.param1))
+        {
+            cmd.type1 = VAL;
+        }
+        else if (is_valid_cell(cmd.param1))
+        {
+            cmd.type1 = CELL;
+        
+        }
+        else
+        {
+            cmd.error = INVALID;
         }
     }
     else
     {
-        strcpy(cmd.error, "Invalid");
+        cmd.error = INVALID;
     }
 
     return cmd;
@@ -238,28 +395,32 @@ int multiply(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
     }
     return arr[x1][y1].val * arr[x2][y2].val;
 }
-int maximum(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
-{
-    if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
-    {
-        return 0;
-    }
-    if (arr[x1][y1].val >= arr[x2][y2].val)
-    {
-        return arr[x1][y1].val;
-    }
-    else
-    {
-        return arr[x2][y2].val;
-    }
-}
-int maximumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
+// int maximum(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
+// {
+//     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
+//     {
+//         return 0;
+//     }
+//     if (arr[x1][y1].val >= arr[x2][y2].val)
+//     {
+//         return arr[x1][y1].val;
+//     }
+//     else
+//     {
+//         return arr[x2][y2].val;
+//     }
+// }
+int maximumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr, cell *tgt)
 {
     int max = arr[x1][y1].val;
     for (int i = x1; i <= x2; i++)
     {
-        for (int j = y1; j < y2; j++)
+        for (int j = y1; j <= y2; j++)
         {
+            if(arr[i][j].isDivByZero){
+                tgt->isDivByZero=1;
+                return 0;
+            }
             if (max < arr[i][j].val)
             {
                 max = arr[i][j].val;
@@ -268,13 +429,17 @@ int maximumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
     }
     return max;
 }
-int minimumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
+int minimumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr, cell *tgt)
 {
     int min = arr[x1][y1].val;
     for (int i = x1; i <= x2; i++)
     {
-        for (int j = y1; j < y2; j++)
+        for (int j = y1; j <= y2; j++)
         {
+            if(arr[i][j].isDivByZero){
+                tgt->isDivByZero=1;
+                return 0;
+            }
             if (min > arr[i][j].val)
             {
                 min = arr[i][j].val;
@@ -283,52 +448,61 @@ int minimumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
     }
     return min;
 }
-int sumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
+int sumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr, cell *tgt)
 {
     int sum = 0;
     for (int i = x1; i <= x2; i++)
     {
-        for (int j = y1; j < y2; j++)
+        for (int j = y1; j <= y2; j++)
         {
+            if(arr[i][j].isDivByZero){
+                tgt->isDivByZero=1;
+                return 0;
+            }
             sum += arr[i][j].val;
         }
     }
     return sum;
 }
-int avgrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
+int avgrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr, cell *tgt)
 {
     int freq = (x2 - x1 + 1) * (y2 - y1 + 1);
-    return sumrange(x1, y1, x2, y2, row, col, arr) / freq;
+    return sumrange(x1, y1, x2, y2, row, col, arr, tgt) / freq;
 }
-int stdev(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
+int stdev(int x1, int y1, int x2, int y2, int row, int col, cell **arr, cell *tgt)
 {
-    int mean = avgrange(x1, y1, x2, y2, row, col, arr);
-    int sum = 0;
+    int mean = avgrange(x1, y1, x2, y2, row, col, arr, tgt);
+    double sum_of_sq = 0;
+    int n = (x2 - x1 + 1) * (y2 - y1 + 1);
     for (int i = x1; i <= x2; i++)
     {
-        for (int j = y1; j < y2; j++)
+        for (int j = y1; j <= y2; j++)
         {
-            int diff = arr[i][j].val - mean;
-            sum += (diff * diff);
+            if(arr[i][j].isDivByZero){
+                tgt->isDivByZero=1;
+                return 0;
+            }
+            sum_of_sq+=(arr[i][j].val - mean)*(arr[i][j].val - mean);
         }
     }
-    return sum;
+    sum_of_sq/=n;
+    return (int)round(sqrt(sum_of_sq));
 }
-int minimum(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
-{
-    if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
-    {
-        return 0;
-    }
-    if (arr[x1][y1].val <= arr[x2][y2].val)
-    {
-        return arr[x1][y1].val;
-    }
-    else
-    {
-        return arr[x2][y2].val;
-    }
-}
+// int minimum(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
+// {
+//     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
+//     {
+//         return 0;
+//     }
+//     if (arr[x1][y1].val <= arr[x2][y2].val)
+//     {
+//         return arr[x1][y1].val;
+//     }
+//     else
+//     {
+//         return arr[x2][y2].val;
+//     }
+// }
 int max(int a, int b)
 {
     if (a >= b)
@@ -382,7 +556,15 @@ void Display(int row, int col, cell **arr, int rowi, int coli)
         printf("%d\t", i + 1);
         for (int j = coli; j < coli + 10 && j < col; j++)
         {
-            printf("%d\t", arr[i][j].val);
+            if (arr[i][j].isDivByZero == 1)
+            {
+                printf("ERR\t");
+            }
+            else
+            {
+
+                printf("%d\t", arr[i][j].val);
+            }
         }
         printf("\n");
     }
@@ -421,6 +603,7 @@ coordinate convert_to_index(char *str)
         }
     }
     coordinate c = {return_index[0] - 1, return_index[1] - 1};
+    // printf("c.x:%d,c.y:%d\n", c.x, c.y);
     return c;
 }
 
@@ -524,10 +707,13 @@ void free_cell(cell *c)
 
 int topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sorted_cells, int *index, cell **arr)
 {
-    
+    // if (debug)
+    //     printf("v:%s\n", v);
+
     if (contains(stack, v))
     {
-        fprintf(stderr, "Cycle detected in the graph\n");
+        // if (debug)
+        //     printf("Vishal\n");
         return 1;
     }
 
@@ -544,7 +730,11 @@ int topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sort
             while (current)
             { // Traverse the linked list in each bucket
                 // callback(current->value);  // Call the callback function with the string
-                return topological_sort_util(current->value, visited, stack, sorted_cells, index, arr);
+                int x = topological_sort_util(current->value, visited, stack, sorted_cells, index, arr);
+                if (x == 1)
+                {
+                    return 1;
+                }
                 current = current->next;
             }
         }
@@ -561,33 +751,33 @@ char **topological_sort(char *cell_name, cell **arr, int row, int col)
 {
     coordinate coord = convert_to_index(cell_name);
     cell *start = &arr[coord.x][coord.y];
-    printf("hello1\n");
-    int total_cells = row*col;
-    printf("hello2\n");
+
+    int total_cells = row * col;
+
     HashSet *visited = create_hashset();
-    printf("hello3\n");
+
     HashSet *stack = create_hashset();
-    printf("hello4\n");
+
     char **sorted_cells = (char **)malloc(total_cells * sizeof(char *));
-    printf("hello5\n");
+
     if (sorted_cells == NULL)
     {
         fprintf(stderr, "Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
     int index = 0;
-    printf("hello6\n");
-    
+
     int is_cycle = topological_sort_util(cell_name, visited, stack, sorted_cells, &index, arr);
-    if(is_cycle==1){
+    if (is_cycle == 1)
+    {
         return NULL;
     }
-    printf("hello7\n");
 
     // free(sorted_cells);
+    // if (debug)
+    //     printf("index:%d\n", index);
     free_hashset(visited);
     free_hashset(stack);
-    printf("index:%d\n", index);
 
     for (int i = 0; i < index / 2; i++)
     {
@@ -595,110 +785,245 @@ char **topological_sort(char *cell_name, cell **arr, int row, int col)
         sorted_cells[i] = sorted_cells[index - i - 1];
         sorted_cells[index - i - 1] = temp;
     }
-    printf("hello8\n");
+    // if (debug)
+    // {
+    //     printf("Sorted cells: ");
+    //     for (int i = 0; i < index; i++)
+    //     {
+    //         printf("%s\n", sorted_cells[i]);
+    //     }
+    // }
     return sorted_cells;
 }
 
 void update(cell *tgt, cell **arr, int row, int col)
 {
     commandCall parsed_inp = tgt->cmd;
-    if (strcmp(parsed_inp.type, "val") == 0)
+    tgt->isDivByZero = 0;
+    if (parsed_inp.type== 0)
     {
-        if (strcmp(parsed_inp.type1, "val") == 0)
+        if (parsed_inp.type1== 0)
         {
             tgt->val = atoi(parsed_inp.param1);
         }
         else
         {
             coordinate source1 = convert_to_index(parsed_inp.param1);
-            tgt->val = arr[source1.x][source1.y].val;
+            if (arr[source1.x][source1.y].isDivByZero)
+            {
+                tgt->isDivByZero = 1;
+                tgt->val = 0;
+            }
+            else
+            {
+            tgt->val = arr[source1.x][source1.y].val;}
         }
     }
-    else if (strcmp(parsed_inp.type, "art") == 0)
+    else if (parsed_inp.type== 1)
     {
-        if (strcmp(parsed_inp.type1, "val") == 0)
+        if (parsed_inp.type1 == 0)
         {
-            if (strcmp(parsed_inp.type2, "val") == 0)
+            if (parsed_inp.type2 == 0)
             {
-                if (strcmp(parsed_inp.cmd, "add") == 0)
+                if (parsed_inp.cmd== 0)
                 {
                     tgt->val = atoi(parsed_inp.param1) + atoi(parsed_inp.param2);
                 }
-                else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                else if (parsed_inp.cmd== 1)
                 {
                     tgt->val = atoi(parsed_inp.param1) - atoi(parsed_inp.param2);
                 }
-                else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                else if (parsed_inp.cmd== 2)
                 {
                     tgt->val = atoi(parsed_inp.param1) * atoi(parsed_inp.param2);
                 }
                 else
                 {
-                    tgt->val = atoi(parsed_inp.param1) / atoi(parsed_inp.param2);
+                    if(atoi(parsed_inp.param2)==0){
+                        tgt->val = 0;
+                        tgt->isDivByZero = 1;
+                    }
+                    else{
+                        tgt->val = atoi(parsed_inp.param1) / atoi(parsed_inp.param2);
+                    }
                 }
             }
             else
             {
                 coordinate source2 = convert_to_index(parsed_inp.param2);
-                if (strcmp(parsed_inp.cmd, "add") == 0)
+                if (parsed_inp.cmd== 0)
                 {
                     tgt->val = atoi(parsed_inp.param1) + arr[source2.x][source2.y].val;
                 }
-                else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                else if (parsed_inp.cmd== 1)
                 {
                     tgt->val = atoi(parsed_inp.param1) - arr[source2.x][source2.y].val;
                 }
-                else if (strcmp(parsed_inp.cmd, "mul") == 0)
-                {
+                else if (parsed_inp.cmd== 2) {
                     tgt->val = atoi(parsed_inp.param1) * arr[source2.x][source2.y].val;
                 }
                 else
                 {
-                    tgt->val = atoi(parsed_inp.param1) / arr[source2.x][source2.y].val;
+                    if(arr[source2.x][source2.y].val == 0){
+                        tgt->isDivByZero = 1;
+                        tgt->val = 0;
+                    }
+                    else{
+                        tgt->val = atoi(parsed_inp.param1) / arr[source2.x][source2.y].val;
+                    }
                 }
             }
         }
         else
         {
             coordinate source1 = convert_to_index(parsed_inp.param1);
+            if(arr[source1.x][source1.y].isDivByZero){
+                tgt->isDivByZero = 1;
+                tgt->val = 0;
+            }
 
-            if (strcmp(parsed_inp.type2, "val") == 0)
+            if (parsed_inp.type2== 0)
             {
                 coordinate source1 = convert_to_index(parsed_inp.param1);
-                if (strcmp(parsed_inp.cmd, "add") == 0)
+                if (parsed_inp.cmd== 0)
                 {
                     tgt->val = atoi(parsed_inp.param2) + arr[source1.x][source1.y].val;
                 }
-                else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                else if (parsed_inp.cmd== 1)
                 {
-                    tgt->val = atoi(parsed_inp.param2) - arr[source1.x][source1.y].val;
+                    tgt->val = arr[source1.x][source1.y].val - atoi(parsed_inp.param2);
                 }
-                else if (strcmp(parsed_inp.cmd, "mul") == 0)
-                {
+                else if (parsed_inp.cmd== 2){
                     tgt->val = atoi(parsed_inp.param2) * arr[source1.x][source1.y].val;
                 }
                 else
                 {
-                    tgt->val = atoi(parsed_inp.param2) / arr[source1.x][source1.y].val;
+                    if(atoi(parsed_inp.param2)==0){
+                        tgt->val = 0;
+                        tgt->isDivByZero = 1;
+                    }
+                    else{
+                        tgt->val = arr[source1.x][source1.y].val / atoi(parsed_inp.param2);
+                    }
                 }
             }
             else
             {
                 coordinate source1 = convert_to_index(parsed_inp.param1);
                 coordinate source2 = convert_to_index(parsed_inp.param2);
-                if (strcmp(parsed_inp.cmd, "add") == 0)
+                if(arr[source2.x][source2.y].isDivByZero){
+                    tgt->isDivByZero = 1;
+                    tgt->val = 0;
+                }
+                if (parsed_inp.cmd== 0)
                 {
                     tgt->val = addition(source1.x, source1.y, source2.x, source2.y, row, col, arr);
                 }
-                else if (strcmp(parsed_inp.cmd, "sub") == 0)
+                else if (parsed_inp.cmd== 1)
                 {
                     tgt->val = subtraction(source1.x, source2.y, source2.x, source2.y, row, col, arr);
                 }
-                else if (strcmp(parsed_inp.cmd, "mul") == 0)
+                else if (parsed_inp.cmd== 2)
                 {
                     tgt->val = multiply(source1.x, source2.y, source2.x, source2.y, row, col, arr);
+                }
+                else if (parsed_inp.cmd== 3)
+                {
+                    if(arr[source2.x][source2.y].val == 0){
+                        tgt->isDivByZero = 1;
+                        tgt->val = 0;
+                    }
+                    else{
+                        tgt->val = arr[source1.x][source1.y].val / arr[source2.x][source2.y].val;
+                    }
+                }
+                else
+                {
+                    if(arr[source2.x][source2.y].val == 0){
+                        tgt->isDivByZero = 1;
+                        tgt->val = 0;
+                    }
+                    else{
+                        tgt->val = arr[source1.x][source1.y].val / arr[source2.x][source2.y].val;
+                    }
                 }
             }
         }
     }
+    else
+    {
+        if (parsed_inp.cmd== 1)
+        {
+            coordinate x1 = convert_to_index(parsed_inp.param1);
+            coordinate x2 = convert_to_index(parsed_inp.param2);
+            tgt->val = (maximumrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
+        }
+        else if (parsed_inp.cmd== 0)
+        {
+            coordinate x1 = convert_to_index(parsed_inp.param1);
+            coordinate x2 = convert_to_index(parsed_inp.param2);
+            tgt->val = (minimumrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
+        }
+        else if (parsed_inp.cmd== 2)
+        {
+            coordinate x1 = convert_to_index(parsed_inp.param1);
+            coordinate x2 = convert_to_index(parsed_inp.param2);
+            tgt->val = (sumrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
+        }
+        else if (parsed_inp.cmd== 3)
+        {
+            coordinate x1 = convert_to_index(parsed_inp.param1);
+            coordinate x2 = convert_to_index(parsed_inp.param2);
+            tgt->val = (avgrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
+        }
+        else if (parsed_inp.cmd== 4)
+        {
+            coordinate x1 = convert_to_index(parsed_inp.param1);
+            coordinate x2 = convert_to_index(parsed_inp.param2);
+            tgt->val = (stdev(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
+        }
+        else if (parsed_inp.cmd== 5)
+        {
+            if (parsed_inp.type1 != 0)
+            {
+                coordinate source1 = convert_to_index(parsed_inp.param1);
+                tgt->val = arr[source1.x][source1.y].val;
+            }
+        }
+    }
+}
+
+int isSigned(char *inp)
+{
+    char *pt = inp;
+    while (*pt != '=' && *pt != '\0')
+    {
+        pt++;
+    }
+    if (*pt == '\0')
+    {
+        return 0;
+    }
+    pt++;
+    if (*pt == '\0')
+    {
+        return 0;
+    }
+    if (*pt == '-' || *pt == '+')
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int encode_cell(char* cell_str){
+    coordinate c =convert_to_index(cell_str);
+    return c.x*(100000)+c.y;
+}
+
+coordinate decode_cell(int cellcode){
+    coordinate c;
+    c.x = cellcode/100000;
+    c.y = cellcode%100000;
+    return c;
 }
