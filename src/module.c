@@ -55,7 +55,7 @@ int is_valid_val(char *str)
 commandCall parse(char *inp)
 {
     commandCall cmd = {0};
-
+    printf("inp:%s\n", inp);
     // Handle simple commands
     if (strcmp(inp, "disable_output") == 0 || strcmp(inp, "enable_output") == 0 || strcmp(inp, "w") == 0 || strcmp(inp, "d") == 0 || strcmp(inp, "a") == 0 || strcmp(inp, "s") == 0)
     {
@@ -72,15 +72,17 @@ commandCall parse(char *inp)
         }
         else
         {
-            strcpy(cmd.error, "Invalid cell");
+            strcpy(cmd.error, "Invalid");
         }
     }
+
     // Handle function commands
     else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", cmd.target, cmd.cmd, cmd.param1, cmd.param2) == 4)
     {
+        printf("x1");
         if (strcmp(cmd.cmd, "MAX") == 0 || strcmp(cmd.cmd, "MIN") == 0 ||
             strcmp(cmd.cmd, "SUM") == 0 || strcmp(cmd.cmd, "AVG") == 0 ||
-            strcmp(cmd.cmd, "STDEV") == 0)
+            strcmp(cmd.cmd, "STDEV") == 0 || strcmp(cmd.cmd, "SLEEP") == 0)
         {
             strcpy(cmd.type, "func");
             if (is_valid_val(cmd.param1))
@@ -93,7 +95,7 @@ commandCall parse(char *inp)
             }
             else
             {
-                strcpy(cmd.error, "Invalid param1");
+                strcpy(cmd.error, "Invalid");
                 return cmd;
             }
 
@@ -107,34 +109,34 @@ commandCall parse(char *inp)
             }
             else
             {
-                strcpy(cmd.error, "Invalid param2");
+                strcpy(cmd.error, "Invalid");
                 return cmd;
             }
 
             if (strcmp(cmd.type1, cmd.type2) != 0)
             {
-                strcpy(cmd.error, "param1 and param2 type dont match");
+                strcpy(cmd.error, "typeERR");
                 return cmd;
             }
         }
         else
         {
-            strcpy(cmd.error, "Unknown command");
+            strcpy(cmd.error, "UnkCmd");
         }
     }
-    else if (sscanf(inp, "SLEEP(%s)", cmd.param1) == 1)
-    {
-        strcpy(cmd.type, "func");
-        strcpy(cmd.cmd, "SLEEP");
-        if (is_valid_val(cmd.param1))
-        {
-            strcpy(cmd.type1, "val");
-        }
-        else
-        {
-            strcpy(cmd.error, "Invalid param1");
-        }
-    }
+    // else if (sscanf(inp, "%[^=]=SLEEP(%[^)])", cmd.target ,cmd.param1) == 1)
+    // {
+    //     strcpy(cmd.type, "func");
+    //     strcpy(cmd.cmd, "SLEEP");
+    //     if (is_valid_val(cmd.param1))
+    //     {
+    //         strcpy(cmd.type1, "val");
+    //     }
+    //     else
+    //     {
+    //         strcpy(cmd.error, "Invalid");
+    //     }
+    // }
     // Handle arithmetic commands
     else if (sscanf(inp, "%[^=]=%[^+-*/]%[+-*/]%s", cmd.target, cmd.param1, cmd.cmd, cmd.param2) == 4)
     {
@@ -166,7 +168,7 @@ commandCall parse(char *inp)
         }
         else
         {
-            strcpy(cmd.error, "Invalid param1");
+            strcpy(cmd.error, "Invalid");
             return cmd;
         }
 
@@ -180,7 +182,7 @@ commandCall parse(char *inp)
         }
         else
         {
-            strcpy(cmd.error, "Invalid param2");
+            strcpy(cmd.error, "Invalid");
             return cmd;
         }
     }
@@ -200,12 +202,12 @@ commandCall parse(char *inp)
         }
         else
         {
-            strcpy(cmd.error, "Invalid value or cell in param1");
+            strcpy(cmd.error, "Invalid");
         }
     }
     else
     {
-        strcpy(cmd.error, "Invalid input format");
+        strcpy(cmd.error, "Invalid");
     }
 
     return cmd;
@@ -525,7 +527,7 @@ int topological_sort_util(char *v, HashSet *visited, HashSet *stack, char **sort
     
     if (contains(stack, v))
     {
-        printf("Vishal\n");
+        fprintf(stderr, "Cycle detected in the graph\n");
         return 1;
     }
 

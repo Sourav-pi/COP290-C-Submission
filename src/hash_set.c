@@ -6,21 +6,21 @@
 
 
 unsigned int hash(const char *str) {
-    const unsigned int FNV_prime = 16777619;  
-    const unsigned int offset_basis = 2166136261U;  
+    const unsigned int FNV_prime = 16777619;  // FNV prime constant
+    const unsigned int offset_basis = 2166136261U;  // FNV offset basis
     unsigned int hash = offset_basis;
 
     while (*str) {
-        hash ^= (unsigned char)(*str++);  
-        hash *= FNV_prime;             
+        hash ^= (unsigned char)(*str++);  // XOR with the current character
+        hash *= FNV_prime;              // Multiply by the prime constant
     }
 
-    return hash % HASHSET_SIZE;  
+    return hash % HASHSET_SIZE;  // Map hash to a bucket index
 }
 
 
 
-
+// Initialize the HashSet
 HashSet* create_hashset() {
     HashSet *set = (HashSet *)malloc(sizeof(HashSet));
     if (!set) {
@@ -33,21 +33,23 @@ HashSet* create_hashset() {
     return set;
 }
 
-
+// Check if a string exists in the HashSet
 int contains(HashSet *set, const char *value) {
     unsigned int index = hash(value);
     Node *current = set->buckets[index];
     while (current) {
         if (strcmp(current->value, value) == 0) {
-            return 1;  
+            return 1;  // Found
         }
         current = current->next;
     }
-    return 0;  
+    return 0;  // Not found
 }
+
+// Insert a string into the HashSet
 void insert(HashSet *set, const char *value) {
     if (contains(set, value)) {
-        return; 
+        return;  // Already exists, no duplicates allowed
     }
 
     unsigned int index = hash(value);
@@ -56,22 +58,23 @@ void insert(HashSet *set, const char *value) {
         fprintf(stderr, "Memory allocation failed\n");
         exit(1);
     }
-    new_node->value = strdup(value);  
+    new_node->value = strdup(value);  // Duplicate the string
     new_node->next = set->buckets[index];
     set->buckets[index] = new_node;
 }
 
 void iterate_hashset(HashSet *set, void (*callback)(const char *)) {
-    for (int i = 0; i < HASHSET_SIZE; i++) {  
+    for (int i = 0; i < HASHSET_SIZE; i++) {  // Loop through all buckets
         Node *current = set->buckets[i];
-        while (current) {  
-            callback(current->value);  
+        while (current) {  // Traverse the linked list in each bucket
+            callback(current->value);  // Call the callback function with the string
             current = current->next;
         }
     }
 }
 
 
+// Remove a string from the HashSet
 void remove_string(HashSet *set, const char *value) {
     unsigned int index = hash(value);
     Node *current = set->buckets[index];
@@ -84,8 +87,8 @@ void remove_string(HashSet *set, const char *value) {
             } else {
                 set->buckets[index] = current->next;
             }
-            free(current->value);  
-            free(current);         
+            free(current->value);  // Free the duplicated string
+            free(current);         // Free the node itself
             return;
         }
         prev = current;
@@ -93,14 +96,15 @@ void remove_string(HashSet *set, const char *value) {
     }
 }
 
+// Free all memory used by the HashSet
 void free_hashset(HashSet *set) {
     for (int i = 0; i < HASHSET_SIZE; i++) {
         Node *current = set->buckets[i];
         while (current) {
             Node *temp = current;
             current = current->next;
-            free(temp->value);  
-            free(temp);         
+            free(temp->value);  // Free the duplicated string
+            free(temp);         // Free the node itself
         }
     }
     free(set);
@@ -108,3 +112,56 @@ void free_hashset(HashSet *set) {
 void print_string(const char *str) {
     printf("%s ", str);
 }
+
+// typedef struct {
+//     HashSet *set;
+//     int bucket_index;
+//     Node *current_node;
+// } HashSetIterator;
+
+// HashSetIterator* create_iterator(HashSet *set) {
+//     HashSetIterator *iterator = (HashSetIterator *)malloc(sizeof(HashSetIterator));
+//     if (!iterator) {
+//         fprintf(stderr, "Memory allocation failed\n");
+//         exit(1);
+//     }
+//     iterator->set = set;
+//     iterator->bucket_index = -1;
+//     iterator->current_node = NULL;
+//     return iterator;
+// }
+
+// const char* next(HashSetIterator *iterator) {
+//     if (iterator->current_node && iterator->current_node->next) {
+//         iterator->current_node = iterator->current_node->next;
+//         return iterator->current_node->value;
+//     }
+
+//     for (iterator->bucket_index += 1; iterator->bucket_index < HASHSET_SIZE; iterator->bucket_index++) {
+//         if (iterator->set->buckets[iterator->bucket_index]) {
+//             iterator->current_node = iterator->set->buckets[iterator->bucket_index];
+//             return iterator->current_node->value;
+//         }
+//     }
+
+//     return NULL;  // No more elements
+// }
+
+// void free_iterator(HashSetIterator *iterator) {
+//     free(iterator);
+// }
+
+// int main(){
+//     HashSet* set = create_hashset();
+//     insert(set, "hello");
+//     insert(set, "world");
+//     insert(set, "hello1");
+//     insert(set, "world2");
+//     insert(set, "hello3");
+//     iterate_hashset(set, print_string);
+//     printf("\n");
+//     remove_string(set, "hello");
+//     iterate_hashset(set, print_string);
+    
+
+// }

@@ -5,26 +5,28 @@
 #include <time.h>
 #include "../Include/module.h"
 #include "../Include/hash_set.h"
-#include <sys/resource.h>
+// #include <sys/resource.h>
 
 #define debug 1
 
-void print_memory_usage()
-{
-    struct rusage usage;
-    getrusage(RUSAGE_SELF, &usage);
-    printf("Max memory used: %ld MB\n", usage.ru_maxrss/(1024*1024));
-}
-
-// void print_element(const char *element) {
-//     printf("%s\n", element);
+// void print_memory_usage()
+// {
+//     struct rusage usage;
+//     getrusage(RUSAGE_SELF, &usage);
+//     printf("Max memory used: %ld MB\n", usage.ru_maxrss / (1024 * 1024));
 // }
+
 int main(int argc, char *argv[])
 {
-    printf("%lu\n", sizeof(cell));
-    printf("%lu\n", sizeof(int));
-    printf("%lu\n", sizeof(HashSet));
-    printf("%lu\n", sizeof(commandCall));
+    if (debug)
+        printf("%lu\n", sizeof(cell));
+    if (debug)
+        printf("%lu\n", sizeof(int));
+    if (debug)
+        printf("%lu\n", sizeof(HashSet));
+    if (debug)
+        printf("%lu\n", sizeof(commandCall));
+
     coordinate disp_c = {0, 0};
     int is_disp = 1;
     int row = atoi(argv[1]), col = atoi(argv[2]);
@@ -51,17 +53,28 @@ int main(int argc, char *argv[])
     double time = 0.0;
     char status[100] = "ok";
     commandCall parsed_inp;
+    coordinate tar_cod;
+    cell *tar_cell;
+    commandCall old;
+    coordinate old_cod_1;
+    cell *old_cell_1;
+    coordinate old_cod_2;
+    cell *old_cell_2;
+    int old_val;
+
     while (strcmp(raw_inp, "q") != 0)
     {
         if (is_disp && strcmp(parsed_inp.cmd, "enable_output") != 0)
         {
             Display(row, col, arr, disp_c.x, disp_c.y);
         }
-        printf("[%.2f] (%s) > ", time, status);
-        scanf("%s", raw_inp);
+        printf("[%.1f] (%s) > ", time, status);
+        // scanf("%s", raw_inp);
+        fgets(raw_inp, sizeof(raw_inp), stdin);
 
         parsed_inp = parse(raw_inp);
         // printf("error: %s\n",parsed_inp.error);
+        // debug
         if (debug)
             printf("parsed_inp:\n");
         if (debug)
@@ -80,37 +93,36 @@ int main(int argc, char *argv[])
             printf("target: %s\n", parsed_inp.target);
         if (debug)
             printf("error: %s\n", parsed_inp.error);
-        coordinate tar_cod = convert_to_index(parsed_inp.target);
-        if (debug)
-            printf("A\n");
-        cell *tar_cell = &arr[tar_cod.x][tar_cod.y];
-        if (debug)
-            printf("B\n");
-        commandCall old = tar_cell->cmd;
-        int old_val = tar_cell->val;
-        if (strcmp(old.type1, "cell") == 0)
-        {
-            coordinate old_cod_1 = convert_to_index(old.param1);
-            cell *old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
-            remove_string(old_cell_1->dep, old.target);
-        }
-        if (debug)
-            printf("C\n");
-        if (strcmp(old.type2, "cell") == 0)
-        {
-            coordinate old_cod_2 = convert_to_index(old.param2);
-            cell *old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
-            remove_string(old_cell_2->dep, old.target);
-        }
-        if (debug)
-            printf("D\n");
 
         if (strcmp(parsed_inp.error, "") != 0)
         {
             strcpy(status, parsed_inp.error);
-            printf("error: %s\n", parsed_inp.error);
+            if(debug) ("error: %s\n", parsed_inp.error);
             continue;
         }
+        // save old start
+        if (strcmp(parsed_inp.type, "cmd") != 0)
+        {
+            tar_cod = convert_to_index(parsed_inp.target);
+            tar_cell = &arr[tar_cod.x][tar_cod.y];
+
+            old = tar_cell->cmd;
+            old_val = tar_cell->val;
+            if (strcmp(old.type1, "cell") == 0)
+            {
+                old_cod_1 = convert_to_index(old.param1);
+                old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
+                remove_string(old_cell_1->dep, old.target);
+            }
+            if (strcmp(old.type2, "cell") == 0)
+            {
+                old_cod_2 = convert_to_index(old.param2);
+                old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
+                remove_string(old_cell_2->dep, old.target);
+            }
+        }
+        // save old end
+
         start = clock();
         if (strcmp(parsed_inp.type, "cmd") == 0)
         {
@@ -153,25 +165,28 @@ int main(int argc, char *argv[])
             {
                 disp_c.x = min(row - 1, disp_c.x + 10);
             }
+            // Ensure disp_c.x and disp_c.y are within valid ranges
+            disp_c.x = max(0, min(row - 1, disp_c.x));
+            disp_c.y = max(0, min(col - 1, disp_c.y));
             end = clock();
             time = ((double)(end - start)) / CLOCKS_PER_SEC;
-            print_memory_usage();
+            // print_memory_usage();
             continue;
         }
         else if (strcmp(parsed_inp.type, "func") == 0)
         {
-            // if(strcmp(parsed_inp.cmd,"MAX")==0){
-            //     int x1=convert_to_index(parsed_inp.param1).x;
-            //     int y1=convert_to_index(parsed_inp.param1).y;
-            //     int x2=convert_to_index(parsed_inp.param2).x;
-            //     int y2=convert_to_index(parsed_inp.param2).y;
-            //     if(x1<row && x2<row && y1<col && y2<col){
-            //         printf("%d\n",maximum(x1,y1,x2,y2,row,col,arr));
-            //     }
-            //     else{
-            //         printf("Invalid cell\n");
-            //     }
-            // }
+            if (strcmp(parsed_inp.cmd, "MAX") == 0)
+            {
+                coordinate x1 = convert_to_index(parsed_inp.param1);
+                coordinate x2 = convert_to_index(parsed_inp.param2);
+
+                //     if(x1<row && x2<row && y1<col && y2<col){
+                //         printf("%d\n",maximum(x1,y1,x2,y2,row,col,arr));
+                //     }
+                //     else{
+                //         printf("Invalid cell\n");
+                //     }
+            }
             // else if(strcmp(parsed_inp.cmd,"MIN")==0){
             //     int x1=convert_to_index(parsed_inp.param1).x;
             //     int y1=convert_to_index(parsed_inp.param1).y;
@@ -346,45 +361,48 @@ int main(int argc, char *argv[])
         }
 
         // printf("parsed_inp:\n");
-        char **sorted_cell_names = topological_sort(parsed_inp.target, arr, row, col);
-        if (sorted_cell_names == NULL)
+        if (strcmp(parsed_inp.type, "cmd") != 0)
         {
-            strcpy(status, "Circular dependency");
-            if (debug)
-                printf("Circular dependency\n");
-            tar_cell->cmd = old;
-            tar_cell->val = old_val;
-            if (strcmp(old.type1, "cell") == 0)
+            char **sorted_cell_names = topological_sort(parsed_inp.target, arr, row, col);
+            if (sorted_cell_names == NULL)
             {
-                coordinate old_cod_1 = convert_to_index(old.param1);
-                cell *old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
-                insert(old_cell_1->dep, old.target);
-            }
-            if (strcmp(old.type2, "cell") == 0)
-            {
-                coordinate old_cod_2 = convert_to_index(old.param2);
-                cell *old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
-                insert(old_cell_2->dep, old.target);
-            }
-        }
-        else
-        {
-            for (int i = 0; sorted_cell_names[i] != NULL; i++)
-            {
-                coordinate c = convert_to_index(sorted_cell_names[i]);
-                cell *cell_ptr = &arr[c.x][c.y];
+                strcpy(status, "Circular dependency");
                 if (debug)
-                    printf("%s ", sorted_cell_names[i]);
-                update(cell_ptr, arr, row, col);
-                free(sorted_cell_names[i]);
+                    printf("Circular dependency\n");
+                tar_cell->cmd = old;
+                tar_cell->val = old_val;
+                if (strcmp(old.type1, "cell") == 0)
+                {
+                    coordinate old_cod_1 = convert_to_index(old.param1);
+                    cell *old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
+                    insert(old_cell_1->dep, old.target);
+                }
+                if (strcmp(old.type2, "cell") == 0)
+                {
+                    coordinate old_cod_2 = convert_to_index(old.param2);
+                    cell *old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
+                    insert(old_cell_2->dep, old.target);
+                }
             }
-            if (debug)
-                printf("\n");
-            free(sorted_cell_names);
+            else
+            {
+                for (int i = 0; sorted_cell_names[i] != NULL; i++)
+                {
+                    coordinate c = convert_to_index(sorted_cell_names[i]);
+                    cell *cell_ptr = &arr[c.x][c.y];
+                    if (debug)
+                        printf("%s ", sorted_cell_names[i]);
+                    update(cell_ptr, arr, row, col);
+                    free(sorted_cell_names[i]);
+                }
+                if (debug)
+                    printf("\n");
+                free(sorted_cell_names);
+            }
         }
         end = clock();
         time = ((double)(end - start)) / CLOCKS_PER_SEC;
-        print_memory_usage();
+        // print_memory_usage();
     }
     // Freeing the memory
     for (int i = 0; i < row; i++)
