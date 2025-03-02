@@ -14,6 +14,7 @@ typedef struct HashSet {
 } HashSet;
 
 
+// create hashset
 HashSet* create_hashset(void);
 
 // Check if a string exists in the HashSet

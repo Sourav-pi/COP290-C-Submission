@@ -6,15 +6,6 @@
 
 
 unsigned int hash(const int value) {
-    // const unsigned int FNV_prime = 16777619;  
-    // const unsigned int offset_basis = 2166136261U;  
-    // unsigned int hash = offset_basis;
-
-    // while (*str) {
-    //     hash ^= (unsigned char)(*str++);  
-    //     hash *= FNV_prime;             
-    // }
-
     return value % HASHSET_SIZE;  
 }
 

@@ -89,8 +89,6 @@ int max(int a , int b);
 int min(int a , int b);
 void Display(int row, int col, cell** arr, int rowi, int coli);
 coordinate convert_to_index(char *str);
-cell* create_new_cell() ;
-void free_cell(cell* c);
 void update(cell *tgt, cell **arr, int row, int col);
 Node*topological_sort(int cell_name, cell **arr, int row, int col);
 int isSigned(char* inp);
