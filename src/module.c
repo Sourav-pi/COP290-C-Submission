@@ -170,11 +170,7 @@ commandContainer parse(char *inp, int hasSign)
         if (cmd.cmd==1|| cmd.cmd == 0 || cmd.cmd == 2 || cmd.cmd == 4 || cmd.cmd == 5 || cmd.cmd == 3 )
         {
             cmd.type = FUNC;
-            if (is_valid_val(temp_param1))
-            {
-                cmd.type1=VAL;
-            }
-            else if (is_valid_cell(temp_param1))
+            if (is_valid_cell(temp_param1))
             {
                 cmd.type1=CELL;
             }
@@ -186,11 +182,7 @@ commandContainer parse(char *inp, int hasSign)
                 return cmdc;
             }
 
-            if (is_valid_val(temp_param2))
-            {
-                cmd.type2=VAL;
-            }
-            else if (is_valid_cell(temp_param2))
+           if (is_valid_cell(temp_param2))
             {
                 cmd.type2=CELL;
             }
@@ -202,13 +194,12 @@ commandContainer parse(char *inp, int hasSign)
                 return cmdc;
             }
 
-            if (cmd.type1!=cmd.type2)
-            {
+            if(!is_valid_range(temp_param1,temp_param2)){
                 cmd.error = INVALID;
-                // printf("5");
                 cmdc.cmd = cmd;
                 return cmdc;
             }
+
             cmdc.target = encode_cell(temp_target);
             if(cmd.type1) {
                 cmd.param1 = encode_cell(temp_param1);
@@ -225,7 +216,6 @@ commandContainer parse(char *inp, int hasSign)
         }
         else
         {
-            // printf("Invalid function\n");
             cmd.error = INVALID;
         }
     }
@@ -319,7 +309,6 @@ commandContainer parse(char *inp, int hasSign)
         else
         {
             cmd.error=INVALID;
-            // printf("10");
             cmdc.cmd = cmd;
             return cmdc;
         }
@@ -1051,4 +1040,13 @@ coordinate decode_cell(int cellcode){
     c.x = cellcode/100000;
     c.y = cellcode%100000;
     return c;
+}
+
+int is_valid_range(char* cell1, char* cell2){
+    coordinate c1 = convert_to_index(cell1);
+    coordinate c2 = convert_to_index(cell2);
+    if(c1.x > c2.x || c1.y > c2.y){
+        return 0;
+    }
+    return 1;
 }

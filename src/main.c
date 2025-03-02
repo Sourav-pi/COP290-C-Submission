@@ -5,46 +5,14 @@
 #include <time.h>
 #include "../Include/module.h"
 #include "../Include/hash_set.h"
-#include <sys/resource.h>
 
 #define debug 0
 
-#define  VAL 0;
-#define  ART 1;
-#define  FUNC 2;
-#define  CMD 3;
-
-#define  ADD 0;
-#define  SUB 1;
-#define  MUL 2;
-#define  DIV 3;
-#define  MIN 0;
-#define  MAX 1;
-#define  SUM 2;
-#define  AVG 3;
-#define  STDEV 4;
-#define  SLEEP 5;
-#define  scroll_to 0;
-#define  disable_output 1;
-#define  enable_output 2;
-#define  W 3;
-#define  D 4;
-#define  A 5;
-#define  S 6;
+#define MAXROWS 999
+#define MAXCOLS 18278
 
 int rowmax = 0;
 int colmax = 0;
-
-void print_memory_usage()
-{
-    // if (debug)
-    // {
-
-    //     struct rusage usage;
-    //     getrusage(RUSAGE_SELF, &usage);
-    //     printf("Max memory used: %ld MB\n", usage.ru_maxrss / (1024 * 1024));
-    // }
-}
 
 int main(int argc, char *argv[])
 {
@@ -60,7 +28,17 @@ int main(int argc, char *argv[])
 
     coordinate disp_c = {0, 0};
     int is_disp = 1;
+    if(argc!=3)
+    {
+        printf("Invalid number of arguments\n");
+        return 0;
+    }
     int row = atoi(argv[1]), col = atoi(argv[2]);
+    if(row<=0 || col<=0 || row>MAXROWS || col>MAXCOLS)
+    {
+        printf("Number of rows or columns out of range\n");
+        return 0;
+    }
     rowmax = row;
     colmax = col;
     cell **arr = (cell **)malloc(row * sizeof(cell *));
@@ -141,7 +119,7 @@ int main(int argc, char *argv[])
             continue;
         }
         // save old start
-        if (parsed_inp.type!=3)
+        if (parsed_inp.type!=CMD)
         {
             tar_cod = decode_cell(command.target);
             tar_cell = &arr[tar_cod.x][tar_cod.y];
@@ -163,13 +141,13 @@ int main(int argc, char *argv[])
             }
             else
             {
-                if (old.type1 == 1)
+                if (old.type1 == CELL)
                 {
                     old_cod_1 = decode_cell(old.param1);
                     old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
                     remove_string(old_cell_1->dep, command.target);
                 }
-                if (old.type2 == 1)
+                if (old.type2 == CELL)
                 {
                     old_cod_2 = decode_cell(old.param2);
                     old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
@@ -177,13 +155,13 @@ int main(int argc, char *argv[])
                 }
             }
 
-            if (parsed_inp.error==1)
+            if (parsed_inp.error==INVALID)
             {
                 strcpy(status, "invalid");
                 // printf("error: %s\n", parsed_inp.error);
                 continue;
             }
-            else if (parsed_inp.error==2) {
+            else if (parsed_inp.error==CYCLE ) {
                 strcpy(status, "circular dependency");
                 // printf("error: %s\n", parsed_inp.error);
                 continue;
@@ -192,10 +170,10 @@ int main(int argc, char *argv[])
         // save old end
 
         start = clock();
-        if (parsed_inp.type==3)
+        if (parsed_inp.type==CMD)
         {
             // scroll_to not working
-            if (parsed_inp.cmd==0)
+            if (parsed_inp.cmd==SCROLL_TO)
             {
                 coordinate c = decode_cell(parsed_inp.param1);
                 // printf("%d %d\n",c.x,c.y);
@@ -209,27 +187,27 @@ int main(int argc, char *argv[])
                     strcpy(status, "Invalid cell");
                 }
             }
-            else if (parsed_inp.cmd==1)
+            else if (parsed_inp.cmd==DISABLE_OUTPUT)
             {
                 is_disp = 0;
             }
-            else if (parsed_inp.cmd==2)
+            else if (parsed_inp.cmd==ENABLE_OUTPUT)
             {
                 is_disp = 1;
             }
-            else if (parsed_inp.cmd==3)
+            else if (parsed_inp.cmd==W)
             {
                 disp_c.x = max(0, disp_c.x - 10);
             }
-            else if (parsed_inp.cmd==4)
+            else if (parsed_inp.cmd==D)
             {
                 disp_c.y = min(col - 1, disp_c.y + 10);
             }
-            else if (parsed_inp.cmd==5)
+            else if (parsed_inp.cmd==A)
             {
                 disp_c.y = max(0, disp_c.y - 10);
             }
-            else if (parsed_inp.cmd==6)
+            else if (parsed_inp.cmd==S)
             {
                 disp_c.x = min(row - 1, disp_c.x + 10);
             }
@@ -238,17 +216,16 @@ int main(int argc, char *argv[])
             disp_c.y = max(0, min(col - 1, disp_c.y));
             end = clock();
             time = ((double)(end - start)) / CLOCKS_PER_SEC;
-            print_memory_usage();
             continue;
         }
-        else if (parsed_inp.type== 2)
+        else if (parsed_inp.type== FUNC)
         {
             coordinate c = decode_cell(command.target);
             cell *tgt = &arr[c.x][c.y];
             tgt->cmd = parsed_inp;
-            if (parsed_inp.cmd==5)
+            if (parsed_inp.cmd==SLEEP)
             {
-                if (parsed_inp.type1==0)
+                if (parsed_inp.type1==VAL)
                 {
                     sleep_time = max(0, parsed_inp.param1);
                     sleep(sleep_time);
@@ -265,7 +242,7 @@ int main(int argc, char *argv[])
                     insert(temp->dep, command.target);
                 }
             }
-            else if (parsed_inp.cmd==1)
+            else if (parsed_inp.cmd==MAX)
             {
                 coordinate x1 = decode_cell(parsed_inp.param1);
                 coordinate x2 = decode_cell(parsed_inp.param2);
@@ -278,7 +255,7 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-            else if (parsed_inp.cmd==0)
+            else if (parsed_inp.cmd==MIN)
             {
                 coordinate x1 = decode_cell(parsed_inp.param1);
                 coordinate x2 = decode_cell(parsed_inp.param2);
@@ -292,7 +269,7 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-            else if (parsed_inp.cmd==2)
+            else if (parsed_inp.cmd==SUM)
             {
                 coordinate x1 = decode_cell(parsed_inp.param1);
                 coordinate x2 = decode_cell(parsed_inp.param2);
@@ -306,7 +283,7 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-            else if (parsed_inp.cmd==3)
+            else if (parsed_inp.cmd==AVG)
             {
                 coordinate x1 = decode_cell(parsed_inp.param1);
                 coordinate x2 = decode_cell(parsed_inp.param2);
@@ -320,7 +297,7 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-            else if (parsed_inp.cmd == 4)
+            else if (parsed_inp.cmd == STDEV)
             {
                 coordinate x1 = decode_cell(parsed_inp.param1);
                 coordinate x2 = decode_cell(parsed_inp.param2);
@@ -335,12 +312,12 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        else if (parsed_inp.type == 0)
+        else if (parsed_inp.type == VAL)
         {
             coordinate c = decode_cell(command.target);
             cell *tgt = &arr[c.x][c.y];
             tgt->cmd = parsed_inp;
-            if (parsed_inp.type1 == 0)
+            if (parsed_inp.type1 == VAL)
             {
                 tgt->val =  (parsed_inp.param1);
                 // printf("vaLLl: ÷%d\n",tgt->val);
@@ -364,28 +341,28 @@ int main(int argc, char *argv[])
                 // iterate_hashset(source1_cell.dep,print_element);
             }
         }
-        else if (parsed_inp.type == 1)
+        else if (parsed_inp.type == ART)
         {
             coordinate c = decode_cell(command.target);
             cell *tgt = &arr[c.x][c.y];
             tgt->cmd = parsed_inp;
-            if (parsed_inp.type1== 0)
+            if (parsed_inp.type1== VAL)
             {
-                if (parsed_inp.type2== 0)
+                if (parsed_inp.type2== VAL)
                 {
-                    if (parsed_inp.cmd == 0)
+                    if (parsed_inp.cmd == ADD)
                     {
                         tgt->val = (parsed_inp.param1) + (parsed_inp.param2);
                     }
-                    else if (parsed_inp.cmd==1)
+                    else if (parsed_inp.cmd==SUB)
                     {
                         tgt->val = (parsed_inp.param1) - (parsed_inp.param2);
                     }
-                    else if (parsed_inp.cmd== 2)
+                    else if (parsed_inp.cmd== MUL)
                     {
                         tgt->val = (parsed_inp.param1) * (parsed_inp.param2);
                     }
-                    else if (parsed_inp.cmd == 3)
+                    else if (parsed_inp.cmd == DIV)
                     {
                         if ((parsed_inp.param2) == 0)
                         {
@@ -419,19 +396,19 @@ int main(int argc, char *argv[])
                     {
                         tgt->cmd.isDivByZero = 0;
 
-                        if (parsed_inp.cmd == 0)
+                        if (parsed_inp.cmd == ADD)
                         {
                             tgt->val =  (parsed_inp.param1) + arr[source2.x][source2.y].val;
                         }
-                        else if (parsed_inp.cmd== 1)
+                        else if (parsed_inp.cmd== SUB)
                         {
                             tgt->val =  (parsed_inp.param1) - arr[source2.x][source2.y].val;
                         }
-                        else if (parsed_inp.cmd== 2)
+                        else if (parsed_inp.cmd== MUL)
                         {
                             tgt->val =  (parsed_inp.param1) * arr[source2.x][source2.y].val;
                         }
-                        else if (parsed_inp.cmd== 3)
+                        else if (parsed_inp.cmd== DIV)
                         {
                             if (arr[source2.x][source2.y].val == 0)
                             {
@@ -458,7 +435,7 @@ int main(int argc, char *argv[])
                 cell source1_cell = arr[source1.x][source1.y];
                 insert(source1_cell.dep, command.target);
 
-                if (parsed_inp.type2== 0)
+                if (parsed_inp.type2== VAL)
                 {
                     if (source1_cell.cmd.isDivByZero)
                     {
@@ -470,19 +447,19 @@ int main(int argc, char *argv[])
                     {
                         tgt->cmd.isDivByZero = 0;
 
-                        if (parsed_inp.cmd == 0)
+                        if (parsed_inp.cmd == ADD)
                         {
                             tgt->val =  (parsed_inp.param2) + arr[source1.x][source1.y].val;
                         }
-                        else if (parsed_inp.cmd == 1)
+                        else if (parsed_inp.cmd == SUB)
                         {
                             tgt->val = arr[source1.x][source1.y].val -  (parsed_inp.param2);
                         }
-                        else if (parsed_inp.cmd == 2)
+                        else if (parsed_inp.cmd == MUL)
                         {
                             tgt->val =  (parsed_inp.param2) * arr[source1.x][source1.y].val;
                         }
-                        else if (parsed_inp.cmd== 3)
+                        else if (parsed_inp.cmd== DIV)
                         {
                             if ( (parsed_inp.param2) == 0)
                             {
@@ -517,19 +494,19 @@ int main(int argc, char *argv[])
                     else
                     {
                         tgt->cmd.isDivByZero = 0;
-                        if ( parsed_inp.cmd == 0)
+                        if ( parsed_inp.cmd == ADD)
                         {
                             tgt->val = addition(source1.x, source1.y, source2.x, source2.y, row, col, arr);
                         }
-                        else if (parsed_inp.cmd == 1)
+                        else if (parsed_inp.cmd == SUB)
                         {
                             tgt->val = subtraction(source1.x, source2.y, source2.x, source2.y, row, col, arr);
                         }
-                        else if (parsed_inp.cmd== 2)
+                        else if (parsed_inp.cmd== MUL)
                         {
                             tgt->val = multiply(source1.x, source2.y, source2.x, source2.y, row, col, arr);
                         }
-                        else if (parsed_inp.cmd== 3)
+                        else if (parsed_inp.cmd== DIV)
                         {
                             if (arr[source2.x][source2.y].val == 0)
                             {
@@ -553,7 +530,7 @@ int main(int argc, char *argv[])
         }
 
         // printf("parsed_inp:\n");
-        if (parsed_inp.type != 3)
+        if (parsed_inp.type != CMD)
         {
 
             
@@ -562,7 +539,7 @@ int main(int argc, char *argv[])
             if (sorted_cell_names == NULL)
             {
                 strcpy(status, "Circular dependency");
-                if (parsed_inp.type == 2)
+                if (parsed_inp.type == FUNC)
                 {
                     // printf("XX2/n");
                     coordinate x1 = decode_cell(parsed_inp.param1);
@@ -579,13 +556,13 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    if (parsed_inp.type1 == 1)
+                    if (parsed_inp.type1 == CELL)
                     {
                         old_cod_1 = decode_cell(parsed_inp.param1);
                         old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
                         remove_string(old_cell_1->dep, command.target);
                     }
-                    if ( old.type2== 1)
+                    if ( old.type2== CELL)
                     {
                         old_cod_2 = decode_cell(parsed_inp.param2);
                         old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
@@ -649,7 +626,6 @@ int main(int argc, char *argv[])
         }
         end = clock();
         time = (((double)(end - start)) / CLOCKS_PER_SEC) + sleep_time;
-        print_memory_usage();
     }
     // Freeing the memory
     for (int i = 0; i < row; i++)
