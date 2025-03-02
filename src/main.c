@@ -286,7 +286,34 @@ int main(int argc, char *argv[])
             tgt->cmd = parsed_inp;
             if (parsed_inp.type1 == VAL)
             {
-                if (parsed_inp.type2 == VAL){}
+                if (parsed_inp.type2 == VAL){
+                    if (parsed_inp.cmd == ADD)
+                    {
+                        // printf( "shdfparsed_inp.param1: %d\n", parsed_inp.param1);
+                        tgt->val = (parsed_inp.param1) + (parsed_inp.param2);
+                        // printf( "tgt->val: %d\n", tgt->val);
+                    }
+                    else if (parsed_inp.cmd == SUB)
+                    {
+                        tgt->val = (parsed_inp.param1) - (parsed_inp.param2);
+                    }
+                    else if (parsed_inp.cmd == MUL)
+                    {
+                        tgt->val = (parsed_inp.param1) * (parsed_inp.param2);
+                    }
+                    else
+                    {
+                        if ((parsed_inp.param2) == 0)
+                        {
+                            tgt->val = 0;
+                            tgt->cmd.isDivByZero = 1;
+                        }
+                        else
+                        {
+                            tgt->val = (parsed_inp.param1) / (parsed_inp.param2);
+                        }
+                    }
+                }
                 else
                 {
                     coordinate source2 = decode_cell(parsed_inp.param2);

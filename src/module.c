@@ -732,7 +732,7 @@ void update(cell *tgt, cell **arr, int row, int col)
         {
             if (parsed_inp.type2 == VAL)
             {
-                if (parsed_inp.cmd== A)
+                if (parsed_inp.cmd== ADD)
                 {
                     tgt->val =  (parsed_inp.param1) +  (parsed_inp.param2);
                 }
