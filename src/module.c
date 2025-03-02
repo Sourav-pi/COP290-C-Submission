@@ -707,9 +707,9 @@ void update(cell *tgt, cell **arr, int row, int col)
 {
     commandCall parsed_inp = tgt->cmd;
     tgt->cmd.isDivByZero = 0;
-    if (parsed_inp.type== 0)
+    if (parsed_inp.type== VAL)
     {
-        if (parsed_inp.type1== 0)
+        if (parsed_inp.type1== VAL)
         {
             tgt->val =  (parsed_inp.param1);
         }
@@ -726,21 +726,21 @@ void update(cell *tgt, cell **arr, int row, int col)
             tgt->val = arr[source1.x][source1.y].val;}
         }
     }
-    else if (parsed_inp.type== 1)
+    else if (parsed_inp.type== ART)
     {
-        if (parsed_inp.type1 == 0)
+        if (parsed_inp.type1 == VAL)
         {
-            if (parsed_inp.type2 == 0)
+            if (parsed_inp.type2 == VAL)
             {
-                if (parsed_inp.cmd== 0)
+                if (parsed_inp.cmd== A)
                 {
                     tgt->val =  (parsed_inp.param1) +  (parsed_inp.param2);
                 }
-                else if (parsed_inp.cmd== 1)
+                else if (parsed_inp.cmd== SUB)
                 {
                     tgt->val =  (parsed_inp.param1) -  (parsed_inp.param2);
                 }
-                else if (parsed_inp.cmd== 2)
+                else if (parsed_inp.cmd== MUL)
                 {
                     
                     tgt->val =  (parsed_inp.param1) *  (parsed_inp.param2);
@@ -764,15 +764,15 @@ void update(cell *tgt, cell **arr, int row, int col)
                         tgt->val = 0;
                         return ;
                 }
-                if (parsed_inp.cmd== 0)
+                if (parsed_inp.cmd== ADD)
                 {
                     tgt->val =  (parsed_inp.param1) + arr[source2.x][source2.y].val;
                 }
-                else if (parsed_inp.cmd== 1)
+                else if (parsed_inp.cmd== SUB)
                 {
                     tgt->val =  (parsed_inp.param1) - arr[source2.x][source2.y].val;
                 }
-                else if (parsed_inp.cmd== 2) {
+                else if (parsed_inp.cmd== MUL) {
                     tgt->val =  (parsed_inp.param1) * arr[source2.x][source2.y].val;
                 }
                 else
@@ -796,18 +796,18 @@ void update(cell *tgt, cell **arr, int row, int col)
                 return;
             }
 
-            if (parsed_inp.type2== 0)
+            if (parsed_inp.type2== VAL)
             {
                 
-                if (parsed_inp.cmd== 0)
+                if (parsed_inp.cmd== ADD)
                 {
                     tgt->val =  (parsed_inp.param2) + arr[source1.x][source1.y].val;
                 }
-                else if (parsed_inp.cmd== 1)
+                else if (parsed_inp.cmd== SUB)
                 {
                     tgt->val = arr[source1.x][source1.y].val -  (parsed_inp.param2);
                 }
-                else if (parsed_inp.cmd== 2){
+                else if (parsed_inp.cmd== MUL){
                     tgt->val =  (parsed_inp.param2) * arr[source1.x][source1.y].val;
                 }
                 else
@@ -830,19 +830,19 @@ void update(cell *tgt, cell **arr, int row, int col)
                     tgt->val = 0;
                     return ;
                 }
-                if (parsed_inp.cmd== 0)
+                if (parsed_inp.cmd== ADD)
                 {
                     tgt->val = addition(source1.x, source1.y, source2.x, source2.y, row, col, arr);
                 }
-                else if (parsed_inp.cmd== 1)
+                else if (parsed_inp.cmd== SUB)
                 {
                     tgt->val = subtraction(source1.x, source2.y, source2.x, source2.y, row, col, arr);
                 }
-                else if (parsed_inp.cmd== 2)
+                else if (parsed_inp.cmd== MUL)
                 {
                     tgt->val = multiply(source1.x, source2.y, source2.x, source2.y, row, col, arr);
                 }
-                else if (parsed_inp.cmd== 3)
+                else if (parsed_inp.cmd== DIV)
                 {
                     if(arr[source2.x][source2.y].val == 0){
                         tgt->cmd.isDivByZero = 1;
@@ -867,39 +867,39 @@ void update(cell *tgt, cell **arr, int row, int col)
     }
     else
     {
-        if (parsed_inp.cmd== 1)
+        if (parsed_inp.cmd== MAX)
         {
             coordinate x1 = decode_cell(parsed_inp.param1);
             coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (maximumrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
-        else if (parsed_inp.cmd== 0)
+        else if (parsed_inp.cmd== MIN)
         {
             coordinate x1 = decode_cell(parsed_inp.param1);
             coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (minimumrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
-        else if (parsed_inp.cmd== 2)
+        else if (parsed_inp.cmd== SUM)
         {
             coordinate x1 = decode_cell(parsed_inp.param1);
             coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (sumrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
-        else if (parsed_inp.cmd== 3)
+        else if (parsed_inp.cmd== AVG)
         {
             coordinate x1 = decode_cell(parsed_inp.param1);
             coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (avgrange(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
-        else if (parsed_inp.cmd== 4)
+        else if (parsed_inp.cmd== STDEV)
         {
             coordinate x1 = decode_cell(parsed_inp.param1);
             coordinate x2 = decode_cell(parsed_inp.param2);
             tgt->val = (stdev(x1.x, x1.y, x2.x, x2.y, row, col, arr, tgt));
         }
-        else if (parsed_inp.cmd== 5)
+        else if (parsed_inp.cmd== SLEEP)
         {
-            if (parsed_inp.type1 != 0)
+            if (parsed_inp.type1 != VAL)
             {
                 coordinate source1 = decode_cell(parsed_inp.param1);
                 sleep(arr[source1.x][source1.y].val);
