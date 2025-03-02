@@ -12,10 +12,10 @@ TARGET = target/release/spreadsheet
 
 $(TARGET): $(OBJECTS)
 	echo $(OBJECTS)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ -lm
 
 $(OBJDIR):
 	@mkdir -p $(OBJDIR)

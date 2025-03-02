@@ -481,6 +481,9 @@ int multiply(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
     {
         return 0;
     }
+    // if(arr[x1][y1].cmd.isDivByZero||arr[x2][y2].cmd.isDivByZero){
+
+    // }
     return arr[x1][y1].val * arr[x2][y2].val;
 }
 // int maximum(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
@@ -849,6 +852,7 @@ void update(cell *tgt, cell **arr, int row, int col)
                 }
                 else if (parsed_inp.cmd== 2)
                 {
+                    
                     tgt->val =  (parsed_inp.param1) *  (parsed_inp.param2);
                 }
                 else
@@ -865,6 +869,11 @@ void update(cell *tgt, cell **arr, int row, int col)
             else
             {
                 coordinate source2 = decode_cell(parsed_inp.param2);
+                if (arr[source2.x][source2.y].cmd.isDivByZero){
+                    tgt->cmd.isDivByZero = 1;
+                        tgt->val = 0;
+                        return ;
+                }
                 if (parsed_inp.cmd== 0)
                 {
                     tgt->val =  (parsed_inp.param1) + arr[source2.x][source2.y].val;
@@ -894,11 +903,12 @@ void update(cell *tgt, cell **arr, int row, int col)
             if(arr[source1.x][source1.y].cmd.isDivByZero){
                 tgt->cmd.isDivByZero = 1;
                 tgt->val = 0;
+                return;
             }
 
             if (parsed_inp.type2== 0)
             {
-                coordinate source1 = decode_cell(parsed_inp.param1);
+                
                 if (parsed_inp.cmd== 0)
                 {
                     tgt->val =  (parsed_inp.param2) + arr[source1.x][source1.y].val;
@@ -928,6 +938,7 @@ void update(cell *tgt, cell **arr, int row, int col)
                 if(arr[source2.x][source2.y].cmd.isDivByZero){
                     tgt->cmd.isDivByZero = 1;
                     tgt->val = 0;
+                    return ;
                 }
                 if (parsed_inp.cmd== 0)
                 {

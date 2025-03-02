@@ -319,23 +319,23 @@ int main(int argc, char *argv[])
             tgt->cmd = parsed_inp;
             if (parsed_inp.type1 == VAL)
             {
-                tgt->val =  (parsed_inp.param1);
+                // tgt->val =  (parsed_inp.param1);
                 // printf("vaLLl: ÷%d\n",tgt->val);
             }
             else
             {
                 coordinate source1 = decode_cell(parsed_inp.param1);
-                if (arr[source1.x][source1.y].cmd.isDivByZero)
-                {
-                    tgt->cmd.isDivByZero = 1;
-                    tgt->val = 0;
-                    continue;
-                }
-                else
-                {
-                    tgt->val = arr[source1.x][source1.y].val;
-                    tgt->cmd.isDivByZero = 0;
-                }
+                // if (arr[source1.x][source1.y].cmd.isDivByZero)
+                // {
+                //     tgt->cmd.isDivByZero = 1;
+                //     tgt->val = 0;
+                //     continue;
+                // }
+                // else
+                // {
+                //     tgt->val = arr[source1.x][source1.y].val;
+                //     tgt->cmd.isDivByZero = 0;
+                // }
                 cell source1_cell = arr[source1.x][source1.y];
                 insert(source1_cell.dep, command.target);
                 // iterate_hashset(source1_cell.dep,print_element);
@@ -352,29 +352,29 @@ int main(int argc, char *argv[])
                 {
                     if (parsed_inp.cmd == ADD)
                     {
-                        tgt->val = (parsed_inp.param1) + (parsed_inp.param2);
+                        // tgt->val = (parsed_inp.param1) + (parsed_inp.param2);
                     }
                     else if (parsed_inp.cmd==SUB)
                     {
-                        tgt->val = (parsed_inp.param1) - (parsed_inp.param2);
+                        // tgt->val = (parsed_inp.param1) - (parsed_inp.param2);
                     }
                     else if (parsed_inp.cmd== MUL)
                     {
-                        tgt->val = (parsed_inp.param1) * (parsed_inp.param2);
+                        // tgt->val = (parsed_inp.param1) * (parsed_inp.param2);
                     }
                     else if (parsed_inp.cmd == DIV)
                     {
-                        if ((parsed_inp.param2) == 0)
-                        {
-                            tgt->cmd.isDivByZero = 1;
-                            tgt->val = 0;
-                            continue;
-                        }
-                        else
-                        {
-                            tgt->val =  (parsed_inp.param1) /  (parsed_inp.param2);
-                            tgt->cmd.isDivByZero = 0;
-                        }
+                        // if ((parsed_inp.param2) == 0)
+                        // {
+                        //     tgt->cmd.isDivByZero = 1;
+                        //     tgt->val = 0;
+                        //     // continue;
+                        // }
+                        // else
+                        // {
+                        //     tgt->val =  (parsed_inp.param1) /  (parsed_inp.param2);
+                        //     tgt->cmd.isDivByZero = 0;
+                        // }
                     }
                     // else
                     // {
@@ -386,43 +386,43 @@ int main(int argc, char *argv[])
                     coordinate source2 = decode_cell(parsed_inp.param2);
                     cell source2_cell = arr[source2.x][source2.y];
                     insert(source2_cell.dep, command.target);
-                    if (source2_cell.cmd.isDivByZero)
-                    {
-                        tgt->cmd.isDivByZero = 1;
-                        tgt->val = 0;
-                        continue;
-                    }
-                    else
-                    {
-                        tgt->cmd.isDivByZero = 0;
+                    // if (source2_cell.cmd.isDivByZero)
+                    // {
+                    //     tgt->cmd.isDivByZero = 1;
+                    //     tgt->val = 0;
+                    //     continue;
+                    // }
+                    // else
+                    // {
+                    //     // tgt->cmd.isDivByZero = 0;
 
-                        if (parsed_inp.cmd == ADD)
-                        {
-                            tgt->val =  (parsed_inp.param1) + arr[source2.x][source2.y].val;
-                        }
-                        else if (parsed_inp.cmd== SUB)
-                        {
-                            tgt->val =  (parsed_inp.param1) - arr[source2.x][source2.y].val;
-                        }
-                        else if (parsed_inp.cmd== MUL)
-                        {
-                            tgt->val =  (parsed_inp.param1) * arr[source2.x][source2.y].val;
-                        }
-                        else if (parsed_inp.cmd== DIV)
-                        {
-                            if (arr[source2.x][source2.y].val == 0)
-                            {
-                                tgt->cmd.isDivByZero = 1;
-                                tgt->val = 0;
-                                continue;
-                            }
-                            else
-                            {
-                                tgt->cmd.isDivByZero=0;
-                                tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
-                            }
-                        }
-                    }
+                    //     if (parsed_inp.cmd == ADD)
+                    //     {
+                    //         tgt->val =  (parsed_inp.param1) + arr[source2.x][source2.y].val;
+                    //     }
+                    //     else if (parsed_inp.cmd== SUB)
+                    //     {
+                    //         tgt->val =  (parsed_inp.param1) - arr[source2.x][source2.y].val;
+                    //     }
+                    //     else if (parsed_inp.cmd== MUL)
+                    //     {
+                    //         tgt->val =  (parsed_inp.param1) * arr[source2.x][source2.y].val;
+                    //     }
+                    //     else if (parsed_inp.cmd== DIV)
+                    //     {
+                    //         if (arr[source2.x][source2.y].val == 0)
+                    //         {
+                    //             tgt->cmd.isDivByZero = 1;
+                    //             tgt->val = 0;
+                    //             continue;
+                    //         }
+                    //         else
+                    //         {
+                    //             tgt->cmd.isDivByZero=0;
+                    //             tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
+                    //         }
+                    //     }
+                    // }
                     // else
                     // {
                     //     tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
@@ -436,91 +436,91 @@ int main(int argc, char *argv[])
                 insert(source1_cell.dep, command.target);
 
                 if (parsed_inp.type2== VAL)
-                {
-                    if (source1_cell.cmd.isDivByZero)
-                    {
-                        tgt->cmd.isDivByZero = 1;
-                        tgt->val = 0;
-                        continue;
-                    }
-                    else
-                    {
-                        tgt->cmd.isDivByZero = 0;
+                 {
+                //     if (source1_cell.cmd.isDivByZero)
+                //     {
+                //         tgt->cmd.isDivByZero = 1;
+                //         tgt->val = 0;
+                //         continue;
+                //     }
+                //     else
+                //     {
+                //         tgt->cmd.isDivByZero = 0;
 
-                        if (parsed_inp.cmd == ADD)
-                        {
-                            tgt->val =  (parsed_inp.param2) + arr[source1.x][source1.y].val;
-                        }
-                        else if (parsed_inp.cmd == SUB)
-                        {
-                            tgt->val = arr[source1.x][source1.y].val -  (parsed_inp.param2);
-                        }
-                        else if (parsed_inp.cmd == MUL)
-                        {
-                            tgt->val =  (parsed_inp.param2) * arr[source1.x][source1.y].val;
-                        }
-                        else if (parsed_inp.cmd== DIV)
-                        {
-                            if ( (parsed_inp.param2) == 0)
-                            {
-                                tgt->cmd.isDivByZero = 1;
-                                tgt->val = 0;
-                                continue;
-                            }
-                            else
-                            {
-                                tgt->cmd.isDivByZero = 0;
-                                tgt->val = arr[source1.x][source1.y].val /  (parsed_inp.param2);
-                            }
-                        }
-                    }
-                    // else
-                    // {
-                    //     tgt->val =  (parsed_inp.param2) / arr[source1.x][source1.y].val;
-                    // }
-                }
+                //         if (parsed_inp.cmd == ADD)
+                //         {
+                //             tgt->val =  (parsed_inp.param2) + arr[source1.x][source1.y].val;
+                //         }
+                //         else if (parsed_inp.cmd == SUB)
+                //         {
+                //             tgt->val = arr[source1.x][source1.y].val -  (parsed_inp.param2);
+                //         }
+                //         else if (parsed_inp.cmd == MUL)
+                //         {
+                //             tgt->val =  (parsed_inp.param2) * arr[source1.x][source1.y].val;
+                //         }
+                //         else if (parsed_inp.cmd== DIV)
+                //         {
+                //             if ( (parsed_inp.param2) == 0)
+                //             {
+                //                 tgt->cmd.isDivByZero = 1;
+                //                 tgt->val = 0;
+                //                 continue;
+                //             }
+                //             else
+                //             {
+                //                 tgt->cmd.isDivByZero = 0;
+                //                 tgt->val = arr[source1.x][source1.y].val /  (parsed_inp.param2);
+                //             }
+                //         }
+                //     }
+                //     // else
+                //     // {
+                //     //     tgt->val =  (parsed_inp.param2) / arr[source1.x][source1.y].val;
+                //     // }
+                 }
                 else
                 {
                     coordinate source1 = decode_cell(parsed_inp.param1);
                     coordinate source2 = decode_cell(parsed_inp.param2);
                     cell source2_cell = arr[source2.x][source2.y];
                     insert(source2_cell.dep, command.target);
-                    if (source1_cell.cmd.isDivByZero || source2_cell.cmd.isDivByZero)
-                    {
-                        tgt->cmd.isDivByZero = 1;
-                        tgt->val = 0;
-                        continue;
-                    }
-                    else
-                    {
-                        tgt->cmd.isDivByZero = 0;
-                        if ( parsed_inp.cmd == ADD)
-                        {
-                            tgt->val = addition(source1.x, source1.y, source2.x, source2.y, row, col, arr);
-                        }
-                        else if (parsed_inp.cmd == SUB)
-                        {
-                            tgt->val = subtraction(source1.x, source2.y, source2.x, source2.y, row, col, arr);
-                        }
-                        else if (parsed_inp.cmd== MUL)
-                        {
-                            tgt->val = multiply(source1.x, source2.y, source2.x, source2.y, row, col, arr);
-                        }
-                        else if (parsed_inp.cmd== DIV)
-                        {
-                            if (arr[source2.x][source2.y].val == 0)
-                            {
-                                tgt->cmd.isDivByZero = 1;
-                                tgt->val = 0;
-                                continue;
-                            }
-                            else
-                            {
-                                tgt->cmd.isDivByZero = 0;
-                                tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
-                            }
-                        }
-                    }
+                    // if (source1_cell.cmd.isDivByZero || source2_cell.cmd.isDivByZero)
+                    // {
+                    //     tgt->cmd.isDivByZero = 1;
+                    //     tgt->val = 0;
+                    //     continue;
+                    // }
+                    // else
+                    // {
+                    //     tgt->cmd.isDivByZero = 0;
+                    //     if ( parsed_inp.cmd == ADD)
+                    //     {
+                    //         tgt->val = addition(source1.x, source1.y, source2.x, source2.y, row, col, arr);
+                    //     }
+                    //     else if (parsed_inp.cmd == SUB)
+                    //     {
+                    //         tgt->val = subtraction(source1.x, source2.y, source2.x, source2.y, row, col, arr);
+                    //     }
+                    //     else if (parsed_inp.cmd== MUL)
+                    //     {
+                    //         tgt->val = multiply(source1.x, source2.y, source2.x, source2.y, row, col, arr);
+                    //     }
+                    //     else if (parsed_inp.cmd== DIV)
+                    //     {
+                    //         if (arr[source2.x][source2.y].val == 0)
+                    //         {
+                    //             tgt->cmd.isDivByZero = 1;
+                    //             tgt->val = 0;
+                    //             continue;
+                    //         }
+                    //         else
+                    //         {
+                    //             tgt->cmd.isDivByZero = 0;
+                    //             tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
+                    //         }
+                    //     }
+                    // }
                     // else
                     // {
                     //     tgt->val =  (parsed_inp.param1) / arr[source2.x][source2.y].val;
