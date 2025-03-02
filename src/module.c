@@ -25,10 +25,10 @@ void rev(char *s)
 }
 
 int getOp(char* inp){
-    if(strcmp(inp, "add") == 0) return ADD;
-    if(strcmp(inp, "sub") == 0) return SUB;
-    if(strcmp(inp, "mul") == 0) return MUL;
-    if(strcmp(inp, "div") == 0) return DIV;
+    // if(strcmp(inp, "add") == 0) return ADD;
+    // if(strcmp(inp, "sub") == 0) return SUB;
+    // if(strcmp(inp, "mul") == 0) return MUL;
+    // if(strcmp(inp, "div") == 0) return DIV;
     if(strcmp(inp, "MAX") == 0) return MAX;
     if(strcmp(inp, "MIN") == 0) return MIN;
     if(strcmp(inp, "SUM") == 0) return SUM;
@@ -84,6 +84,9 @@ int is_valid_val(char *str)
     if (*str == '-' || *str == '+')
     {
         str++;
+    }
+    if(!*str){
+        return 0;
     }
     while (*str)
     {
@@ -163,6 +166,12 @@ commandContainer parse(char *inp, int hasSign)
     else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", temp_target, temp, temp_param1, temp_param2) == 4)
     {
         // printf("temp_target:%s,temp:%s,temp_param1:%s,temp_param2:%s\n",temp_target,temp,temp_param1,temp_param2);
+        if(inp[strlen(inp)-1] != ')'){
+            cmd.error = INVALID;
+            // printf("5");
+            cmdc.cmd = cmd;
+            return cmdc;
+        }
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
             // printf("2");
