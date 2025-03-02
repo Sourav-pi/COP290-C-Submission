@@ -67,8 +67,6 @@ void test_remove_string()
 /* ---------- Module Function Tests ---------- */
 void test_is_valid_cell()
 {
-    // Expected valid cells: "A1", "B12", "ZZ9" (assuming within rowmax/colmax)
-    // Set rowmax and colmax to allow these tests.
     rowmax = 100;
     colmax = 100;
     assert(is_valid_cell("A1") == 1);
@@ -105,14 +103,11 @@ void test_encode_decode_cell()
 {
     int code = encode_cell("A1");
     coordinate c = decode_cell(code);
-    // Assuming "A1" maps to 0,0.
     assert(c.x == 0);
     assert(c.y == 0);
 
     code = encode_cell("B2");
     c = decode_cell(code);
-    // Test with known expected mapping (depends on your implementation; adjust if needed)
-    // For example, if B2 becomes (1,1).
     assert(c.x == 1);
     assert(c.y == 1);
 }
@@ -210,7 +205,6 @@ void test_parse_valid_commands()
     strcpy(rawinp, "A1=+123");
     cc = parse(rawinp, 1);
     assert(cc.cmd.type == ART || cc.cmd.type == VAL);
-    // Depending on your parser, adjust expected type and type1 values.
 }
 
 void test_parse_invalid_commands()
@@ -269,7 +263,6 @@ void test_parse_boundary_conditions()
     assert(cc.cmd.param1 == 100000);
     assert(cc.cmd.param2 == 200000);
     assert(cc.cmd.type == FUNC);
-    // Based on your parser, you might need to check spacing; these tests can be adjusted.
 }
 
 void test_remove_whitespace()
@@ -281,8 +274,6 @@ void test_remove_whitespace()
 }
 
 /* ---------- Topological Sort and Update Tests ---------- */
-// If your topological sort detects cycles or returns a list, add tests here.
-// For example, create a simple dependency graph and test:
 void test_topological_sort()
 {
     // Create a simple 2x2 matrix of cells.
@@ -478,6 +469,7 @@ void test_parse_valid_commands_edge_cases()
     cc = parse(rawinp, 0);
     assert(cc.cmd.type == VAL);
     assert(cc.cmd.param1 == -123);
+
 }
 
 void test_parse_invalid_commands_edge_cases()
@@ -537,48 +529,133 @@ void test_parse_invalid_commands_edge_cases()
     strcpy(rawinp, "A1=SUM B1:B10)");
     cc = parse(rawinp, 0);
     assert(cc.cmd.error == INVALID);
+
+    strcpy(rawinp, "");
+    cc = parse(rawinp, 0);
+    assert(cc.cmd.error == INVALID);
 }
+
+void test_display()
+{
+    // Initialize a 10x10 grid
+    int row = 10, col = 10;
+    cell **arr = (cell **)malloc(row * sizeof(cell *));
+    for (int i = 0; i < row; i++)
+    {
+        arr[i] = (cell *)malloc(col * sizeof(cell));
+        for (int j = 0; j < col; j++)
+        {
+            commandCall new_command = {0};
+            cell new_cell = {0, new_command, create_hashset()};
+            arr[i][j] = new_cell;
+        }
+    }
+
+    // Set some values in the grid
+    arr[0][0].val = 10;
+    arr[0][1].val = 20;
+    arr[1][0].val = 30;
+    arr[1][1].val = 40;
+    arr[2][2].cmd.isDivByZero = 1;
+
+    // Call the Display function
+    printf("Displaying 10x10 grid:\n");
+    Display(row, col, arr, 0, 0);
+
+    printf("Displaying 10x10 grid (expected):\n");
+    printf("\tA\tB\tC\tD\tE\tF\tG\tH\tI\tJ\n");
+    printf("1\t10\t20\t0\t0\t0\t0\t0\t0\t0\t0\n");
+    printf("2\t30\t40\t0\t0\t0\t0\t0\t0\t0\t0\n");
+    printf("3\t0\t0\tERR\t0\t0\t0\t0\t0\t0\t0\n");
+    printf("4\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\n");
+    printf("5\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\n");
+    printf("6\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\n");
+    printf("7\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\n");
+    printf("8\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\n");
+    printf("9\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\n");
+    printf("10\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\n");
+
+    // Free memory
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            free_hashset(arr[i][j].dep);
+        }
+        free(arr[i]);
+    }
+    free(arr);
+}
+
 /* ---------- Main Function ---------- */
 int main(int argc, char const *argv[])
 {
-    printf("Running rigorous unit tests...\n");
+    printf("Running unit tests...\n");
 
     /* HashSet Tests */
     test_create_hashset();
+    printf("Test 1 passed : create hashset\n");
     test_contains_and_insert();
+    printf("Test 2 passed : create contains and insert\n");
     test_remove_string();
+    printf("Test 3 passed : remove string\n");
     test_insert_duplicate();
+    printf("Test 4 passed : insert duplicate\n");
     test_remove_nonexistent();
+    printf("Test 5 passed : remove nonexistent\n");
 
     /* Module Function Tests */
     test_is_valid_cell();
+    printf("Test 6 passed : is valid cell\n");
     test_is_valid_val();
+    printf("Test 7 passed : is valid val\n");
     test_is_valid_range();
+    printf("Test 8 passed : is valid range\n");
     test_encode_decode_cell();
+    printf("Test 9 passed : encode decode cell\n");
     test_getOp();
+    printf("Test 10 passed : getOp\n");
     test_is_valid_cell_edge_cases();
+    printf("Test 11 passed : is valid cell edge cases\n");
     test_is_valid_val_edge_cases();
+    printf("Test 12 passed : is valid val edge cases\n");
     test_is_valid_range_edge_cases();
+    printf("Test 13 passed : is valid range edge cases\n");
     test_encode_decode_cell_edge_cases();
+    printf("Test 14 passed : encode decode cell edge cases\n");
     test_getOp_edge_cases();
+    printf("Test 15 passed : getOp edge cases\n");
 
     /* Arithmetic Tests */
     test_arithmetic();
+    printf("Test 16 passed : arithmetic\n");
     test_arithmetic_edge_cases();
+    printf("Test 17 passed : arithmetic edge cases\n");
 
     /* Parse Tests */
     test_parse_valid_commands();
+    printf("Test 18 passed : parse valid commands\n");
     test_parse_invalid_commands();
+    printf("Test 19 passed : parse invalid commands\n");
     test_parse_boundary_conditions();
+    printf("Test 20 passed : parse boundary conditions\n");
     test_parse_valid_commands_edge_cases();
+    printf("Test 21 passed : parse valid commands edge cases\n");
     test_parse_invalid_commands_edge_cases();
+    printf("Test 22 passed : parse invalid commands edge cases\n");
 
     /* Whitespace Removal Test */
     test_remove_whitespace();
+    printf("Test 23 passed : remove whitespace\n");
 
     /* Topological Sort Test */
     test_topological_sort();
+    printf("Test 24 passed : topological sort\n");
 
-    printf("All rigorous tests passed.\n");
+    /* Display Test */
+    printf("Compare the display output with expected output\n");
+    test_display();
+
+    printf("All tests passed.\n");
     return 0;
 }

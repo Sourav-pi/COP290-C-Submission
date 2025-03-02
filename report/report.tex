@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
+\usepackage{float} 
 \usepackage{tikz}
 \usepackage{hyperref}
 \usepackage[a4paper, margin=1in]{geometry}  % Adjust margin size
@@ -136,9 +137,9 @@
     \end{itemize}
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{./report/tree.jpeg}
+    \includegraphics[width=0.3\textwidth]{./report/tree.jpeg}
     \caption{Structure of program.}
     \label{fig:structure}
 \end{figure}
@@ -149,28 +150,44 @@ Describe the edge cases considered and how they were handled.
 \begin{itemize}
     \item \textbf{Empty Input:}
     \begin{itemize}
-        \item The program checks for empty input and returns an appropriate error message.
-    \end{itemize}
-    
-    \item \textbf{Invalid Characters:}
-    \begin{itemize}
-        \item The parser is designed to detect invalid characters and raise an error.
-    \end{itemize}
-    
-    \item \textbf{Large Input Size:}
-    \begin{itemize}
-        \item The program is tested with large input sizes to ensure it handles them efficiently without crashing.
+        \item Empty string does not match with any of the regex patterns hence gives Invalid Input.
     \end{itemize}
     
     \item \textbf{Circular Dependencies:}
     \begin{itemize}
-        \item The topological sorting function checks for circular dependencies and raises an error if found.
+        \item When we give circular dependencies as input, the program detects it by using topological sort and states "Circular Dependency".The old values are retained. 
     \end{itemize}
     
     \item \textbf{Division by Zero:}
     \begin{itemize}
-        \item The program checks for division by zero and sets a specific flag to handle it gracefully.
+        \item The program checks for division by zero and sets a specific flag to handle it gracefully. This value is displayed as "ERR".
     \end{itemize}
+
+    \item \textbf{White space:}
+    \begin{itemize}
+        \item The program removes all white spaces by iterating through the string and removing them.
+    \end{itemize}
+
+    \item \textbf{Duplicate in hashset:}
+    \begin{itemize}
+        \item The program checks for previous occurance of the cell in the hashset and does not add it again.
+    \end{itemize}
+
+    \item \textbf{Scroll to corner cells:}
+    \begin{itemize}
+        \item The program scrolls to the corner cells when scroll\_to cell is given as input. If 10 more cells are not available in each direction then it only shows the available cells.
+    \end{itemize}
+
+    \item \textbf{1 x 1 sized spreadsheet:}
+    \begin{itemize}
+        \item The program handles the case when the spreadsheet is of size 1 x 1 without any errors by displaying the single cell value.
+    \end{itemize}
+
+    \item \textbf{Out of range cell :}
+    \begin{itemize}
+        \item If the input contains any cell which is in the range of the spreadsheet then "Invalid" status is given.
+    \end{itemize}
+
 \end{itemize}
 
 \section{Program Workflow}
