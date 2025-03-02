@@ -96,6 +96,7 @@ Node*topological_sort(int cell_name, cell **arr, int row, int col);
 int isSigned(char* inp);
 int encode_cell(char* cell_str);
 coordinate decode_cell(int cellcode);
+void remove_whitespace(char *str);
 extern int rowmax ;
 extern int colmax ;
 

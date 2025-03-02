@@ -107,6 +107,8 @@ commandContainer parse(char *inp, int hasSign)
     char sym1[12];
     char sym2[12];
 
+    remove_whitespace(inp);
+
     // Handle simple commands
     if (strcmp(inp, "disable_output") == 0 )
     {
@@ -1049,4 +1051,16 @@ int is_valid_range(char* cell1, char* cell2){
         return 0;
     }
     return 1;
+}
+
+void remove_whitespace(char *str) {
+    if(strncmp(temp, "scroll_to", 9) == 0){
+        return;
+    }
+    char *p1 = str, *p2 = str;
+    do {
+        if (!isspace(*p2)) {
+            *p1++ = *p2;
+        }
+    } while (*p2++);
 }
