@@ -72,7 +72,7 @@ void iterate_hashset(HashSet *set, void (*callback)(int)) {
 }
 
 
-void remove_string(HashSet *set, const int value) {
+void remove_element(HashSet *set, const int value) {
     unsigned int index = hash(value);
     Node *current = set->buckets[index];
     Node *prev = NULL;

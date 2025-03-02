@@ -673,7 +673,7 @@ int topological_sort_util(int v, HashSet *visited, HashSet *stack, Node**sorted_
             }
         }
 
-        remove_string(stack, v);
+        remove_element(stack, v);
         Node *new_str = (Node *)malloc(sizeof(Node));
         new_str->value=v;
         new_str->next=sorted_cells;

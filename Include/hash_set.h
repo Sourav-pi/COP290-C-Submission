@@ -26,7 +26,7 @@ void iterate_hashset(HashSet *, void (*callback)(int)) ;
 
 
 // Remove a string from the HashSet
-void remove_string(HashSet *, const int);
+void remove_element(HashSet *, const int);
 
 // Free all memory used by the HashSet
 void free_hashset(HashSet *) ;

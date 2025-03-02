@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
                     for (int j = x1.y; j <= x2.y; j++)
                     {
                         cell *temp = &arr[i][j];
-                        remove_string(temp->dep, command.target);
+                        remove_element(temp->dep, command.target);
                     }
                 }
             }
@@ -110,13 +110,13 @@ int main(int argc, char *argv[])
                 {
                     old_cod_1 = decode_cell(old.param1);
                     old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
-                    remove_string(old_cell_1->dep, command.target);
+                    remove_element(old_cell_1->dep, command.target);
                 }
                 if (old.type2 == CELL)
                 {
                     old_cod_2 = decode_cell(old.param2);
                     old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
-                    remove_string(old_cell_2->dep, command.target);
+                    remove_element(old_cell_2->dep, command.target);
                 }
             }
 
@@ -328,7 +328,7 @@ int main(int argc, char *argv[])
                         for (int j = x1.y; j <= x2.y; j++)
                         {
                             cell *temp = &arr[i][j];
-                            remove_string(temp->dep, command.target);
+                            remove_element(temp->dep, command.target);
                         }
                     }
                 }
@@ -338,13 +338,13 @@ int main(int argc, char *argv[])
                     {
                         old_cod_1 = decode_cell(parsed_inp.param1);
                         old_cell_1 = &arr[old_cod_1.x][old_cod_1.y];
-                        remove_string(old_cell_1->dep, command.target);
+                        remove_element(old_cell_1->dep, command.target);
                     }
                     if (old.type2 == CELL)
                     {
                         old_cod_2 = decode_cell(parsed_inp.param2);
                         old_cell_2 = &arr[old_cod_2.x][old_cod_2.y];
-                        remove_string(old_cell_2->dep, command.target);
+                        remove_element(old_cell_2->dep, command.target);
                     }
                 }
                 tar_cell->cmd = old;
