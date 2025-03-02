@@ -99,5 +99,6 @@ coordinate decode_cell(int cellcode);
 void remove_whitespace(char *str);
 extern int rowmax ;
 extern int colmax ;
+extern float sleep_time;
 
 #endif 

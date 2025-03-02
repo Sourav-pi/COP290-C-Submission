@@ -5,6 +5,7 @@
 #include "../Include/module.h"
 #include "../Include/hash_set.h"
 #include <math.h>
+#include <time.h>
 #define debug 0
 
 // reverse a string in place
@@ -1012,6 +1013,8 @@ void update(cell *tgt, cell **arr, int row, int col)
             if (parsed_inp.type1 != 0)
             {
                 coordinate source1 = decode_cell(parsed_inp.param1);
+                sleep(arr[source1.x][source1.y].val);
+                sleep_time+=arr[source1.x][source1.y].val;
                 tgt->val = arr[source1.x][source1.y].val;
             }
         }
