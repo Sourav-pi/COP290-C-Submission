@@ -37,7 +37,7 @@ void test_contains_and_insert()
     assert(contains(set, 10) == 1);
 
     // Remove and verify removal.
-    remove_string(set, 10);
+    remove_element(set, 10);
     assert(contains(set, 10) == 0);
 
     // Test multiple values.
@@ -51,16 +51,16 @@ void test_contains_and_insert()
     free_hashset(set);
 }
 
-void test_remove_string()
+void test_remove_element()
 {
     HashSet *set = create_hashset();
     insert(set, 42);
     insert(set, 100);
     assert(contains(set, 42) == 1);
-    remove_string(set, 42);
+    remove_element(set, 42);
     assert(contains(set, 42) == 0);
     // Remove non-existent element; should not crash.
-    remove_string(set, 12345);
+    remove_element(set, 12345);
     free_hashset(set);
 }
 
@@ -323,7 +323,7 @@ void test_insert_duplicate()
 void test_remove_nonexistent()
 {
     HashSet *set = create_hashset();
-    remove_string(set, 999);
+    remove_element(set, 999);
     assert(contains(set, 999) == 0);
     free_hashset(set);
 }
@@ -597,7 +597,7 @@ int main(int argc, char const *argv[])
     printf("Test 1 passed : create hashset\n");
     test_contains_and_insert();
     printf("Test 2 passed : create contains and insert\n");
-    test_remove_string();
+    test_remove_element();
     printf("Test 3 passed : remove string\n");
     test_insert_duplicate();
     printf("Test 4 passed : insert duplicate\n");

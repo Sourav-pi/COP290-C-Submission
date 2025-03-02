@@ -9,9 +9,6 @@ unsigned int hash(const int value) {
     return value % HASHSET_SIZE;  
 }
 
-
-
-
 HashSet* create_hashset() {
     HashSet *set = (HashSet *)malloc(sizeof(HashSet));
     if (!set) {

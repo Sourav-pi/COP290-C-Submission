@@ -10,7 +10,7 @@ OPTDIR = target/release
 SOURCES = $(SRCDIR)/main.c $(SRCDIR)/module.c $(SRCDIR)/hash_set.c
 OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
 TARGET = target/release/spreadsheet
-REPORT = ./report/report.tex
+REPORT = ./report.tex
 
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(OPTDIR)
