@@ -13,6 +13,7 @@
 
 int rowmax = 0;
 int colmax = 0;
+float sleep_time = 0.0;
 
 int main(int argc, char *argv[])
 {
@@ -73,7 +74,7 @@ int main(int argc, char *argv[])
     coordinate old_cod_2;
     cell *old_cell_2;
     int old_val;
-    float sleep_time = 0.0;
+
 
     while (strcmp(raw_inp, "q") != 0)
     {
@@ -227,16 +228,12 @@ int main(int argc, char *argv[])
             {
                 if (parsed_inp.type1==VAL)
                 {
-                    sleep_time = max(0, parsed_inp.param1);
-                    sleep(sleep_time);
                     tgt->val =  (parsed_inp.param1);
                     tgt->dep = create_hashset();
                 }
                 else
                 {
                     coordinate source1 = decode_cell(parsed_inp.param1);
-                    sleep_time = max(arr[source1.x][source1.y].val, 0);
-                    sleep(sleep_time);
                     coordinate x1 = decode_cell(parsed_inp.param1);
                     cell *temp = &arr[x1.x][x1.y];
                     insert(temp->dep, command.target);
@@ -614,8 +611,6 @@ int main(int argc, char *argv[])
                     update(cell_ptr, arr, row, col);
                     Node* temp = sorted_cell_names;
                     sorted_cell_names = sorted_cell_names->next;
-
-                    
                     free(temp);
                     
                 }

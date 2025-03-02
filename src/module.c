@@ -6,6 +6,7 @@
 #include "../Include/hash_set.h"
 #include <math.h>
 #include <time.h>
+#include <unistd.h>
 #define debug 0
 
 // reverse a string in place

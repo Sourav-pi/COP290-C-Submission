@@ -9,6 +9,7 @@ OBJDIR = obj
 SOURCES = $(SRCDIR)/main.c $(SRCDIR)/module.c $(SRCDIR)/hash_set.c
 OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
 TARGET = target/release/spreadsheet
+REPORT = ./report/report.tex
 
 $(TARGET): $(OBJECTS)
 	echo $(OBJECTS)
@@ -20,7 +21,15 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 $(OBJDIR):
 	@mkdir -p $(OBJDIR)
 
-clean:
-	rm -rf $(OBJDIR) $(TARGET)
+report:
+	pdflatex $(REPORT)
 
-.PHONY: clean
+test:
+	@gcc -I./Include Test.c src/hash_set.c src/module.c -o test -g && ./test
+
+clean:
+	@rm -rf $(OBJDIR) $(TARGET) test
+	@rm -rf *.aux *.log *.out *.toc
+	@rm -rf *.pdf
+
+.PHONY: clean report test

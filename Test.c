@@ -9,6 +9,7 @@
 
 int rowmax = 100;
 int colmax = 100;
+float sleep_time = 0.0;
 
 /* ---------- HashSet Tests ---------- */
 void test_create_hashset()
