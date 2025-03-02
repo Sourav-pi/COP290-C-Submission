@@ -25,11 +25,8 @@ void rev(char *s)
     }
 }
 
+// generate "OPcode" from Function name
 int getOp(char* inp){
-    // if(strcmp(inp, "add") == 0) return ADD;
-    // if(strcmp(inp, "sub") == 0) return SUB;
-    // if(strcmp(inp, "mul") == 0) return MUL;
-    // if(strcmp(inp, "div") == 0) return DIV;
     if(strcmp(inp, "MAX") == 0) return MAX;
     if(strcmp(inp, "MIN") == 0) return MIN;
     if(strcmp(inp, "SUM") == 0) return SUM;
@@ -59,7 +56,6 @@ int is_valid_cell(char *str)
     int st = i;
     while (i < len && str[i] >= '0' && str[i] <= '9')
     {
-
         i++;
     }
     if (i - st < 1 || i - st > 3)
@@ -124,7 +120,6 @@ commandContainer parse(char *inp, int hasSign)
     {
         cmd.type = CMD;
         cmd.cmd = ENABLE_OUTPUT;
-
     }
     else if ( strcmp(inp, "w") == 0)
     {
@@ -154,28 +149,23 @@ commandContainer parse(char *inp, int hasSign)
         if (is_valid_cell(temp_param1))
         {
             cmd.type1 = CELL;
-
         }
         else
         {
             cmd.error = INVALID;
-            // printf("1");
         }
         cmd.param1 = encode_cell(temp_param1);
     }
     // Handle function commands
     else if (sscanf(inp, "%[^=]=%[^()](%[^:]:%[^)])", temp_target, temp, temp_param1, temp_param2) == 4)
     {
-        // printf("temp_target:%s,temp:%s,temp_param1:%s,temp_param2:%s\n",temp_target,temp,temp_param1,temp_param2);
         if(inp[strlen(inp)-1] != ')'){
             cmd.error = INVALID;
-            // printf("5");
             cmdc.cmd = cmd;
             return cmdc;
         }
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
-            // printf("2");
             cmdc.cmd = cmd;
             return cmdc;
         }
@@ -190,7 +180,6 @@ commandContainer parse(char *inp, int hasSign)
             else
             {
                 cmd.error=INVALID;
-                // printf("3");
                 cmdc.cmd = cmd;
                 return cmdc;
             }
@@ -202,7 +191,6 @@ commandContainer parse(char *inp, int hasSign)
             else
             {
                 cmd.error = INVALID;
-                // printf("4");
                 cmdc.cmd = cmd;
                 return cmdc;
             }
@@ -236,7 +224,6 @@ commandContainer parse(char *inp, int hasSign)
     {
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
-            // printf("6");
             cmdc.cmd = cmd;
 
             return cmdc;
@@ -254,7 +241,6 @@ commandContainer parse(char *inp, int hasSign)
         else
         {
             cmd.error = INVALID;
-            // printf("7");
             cmdc.cmd = cmd;
             return cmdc;
         }
@@ -271,7 +257,6 @@ commandContainer parse(char *inp, int hasSign)
     {
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
-            // printf("8");
             cmdc.cmd = cmd;
             return cmdc;
         }
@@ -305,7 +290,6 @@ commandContainer parse(char *inp, int hasSign)
         else
         {
             cmd.error = INVALID;
-            // printf("9");
             cmdc.cmd = cmd;
             return cmdc;
         }
@@ -331,7 +315,6 @@ commandContainer parse(char *inp, int hasSign)
             if (cmd.type1!=0)
             {
                 cmd.error = INVALID;
-                // printf("11");
                 cmdc.cmd = cmd;
                 return cmdc;
             }
@@ -354,10 +337,8 @@ commandContainer parse(char *inp, int hasSign)
     }
     else if (!hasSign && sscanf(inp, "%[^=]=%[^+-*/]%1[+-*/]%s", temp_target, temp_param1, temp, temp_param2) == 4)
     {
-        // printf("temp_target:%s,temp_param1:%s,temp:%s,temp_param2:%s\n",temp_target,temp_param1,temp,temp_param2);
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
-            // printf("12");
             cmdc.cmd = cmd;
             return cmdc;
         }
@@ -390,7 +371,6 @@ commandContainer parse(char *inp, int hasSign)
         else
         {
             cmd.error = INVALID;
-            // printf("13");
             cmdc.cmd = cmd;
             return cmdc;
         }
@@ -406,7 +386,6 @@ commandContainer parse(char *inp, int hasSign)
         else
         {
             cmd.error = INVALID;
-            // printf("14");
             cmdc.cmd = cmd;
             return cmdc;
         }
@@ -430,12 +409,10 @@ commandContainer parse(char *inp, int hasSign)
     {
         if(is_valid_cell(temp_target)==0){
             cmd.error = INVALID;
-            // printf("15");
             cmdc.cmd = cmd;
             return cmdc;
         }
         cmd.type = VAL;
-// set
         if (is_valid_val(temp_param1))
         {
             cmd.type1 = VAL;
@@ -443,18 +420,15 @@ commandContainer parse(char *inp, int hasSign)
         else if (is_valid_cell(temp_param1))
         {
             cmd.type1 = CELL;
-        
         }
         else
         {
             cmd.error = INVALID;
-            // printf("16");
         }
     }
     else
     {
         cmd.error = INVALID;
-        // printf("17");
     }
     cmdc.target = encode_cell(temp_target);
             if(cmd.type1) {
@@ -463,8 +437,6 @@ commandContainer parse(char *inp, int hasSign)
             else{
                 cmd.param1 = atoi(temp_param1);
             }
-    // print cmdc formatted
-    // printf("cmdc.target:%d,cmdc.cmd.type:%d,cmdc.cmd.cmd:%d,cmdc.cmd.type1:%d,cmdc.cmd.type2:%d,cmdc.cmd.error:%d,cmdc.cmd.isDivByZero:%d,cmdc.cmd.param1:%d,cmdc.cmd.param2:%d\n",cmdc.target,cmdc.cmd.type,cmdc.cmd.cmd,cmdc.cmd.type1,cmdc.cmd.type2,cmdc.cmd.error,cmdc.cmd.isDivByZero,cmdc.cmd.param1,cmdc.cmd.param2);
     cmdc.cmd = cmd;
     return cmdc;
 }
@@ -492,26 +464,8 @@ int multiply(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
     {
         return 0;
     }
-    // if(arr[x1][y1].cmd.isDivByZero||arr[x2][y2].cmd.isDivByZero){
-
-    // }
     return arr[x1][y1].val * arr[x2][y2].val;
 }
-// int maximum(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
-// {
-//     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
-//     {
-//         return 0;
-//     }
-//     if (arr[x1][y1].val >= arr[x2][y2].val)
-//     {
-//         return arr[x1][y1].val;
-//     }
-//     else
-//     {
-//         return arr[x2][y2].val;
-//     }
-// }
 int maximumrange(int x1, int y1, int x2, int y2, int row, int col, cell **arr, cell *tgt)
 {
     int max = arr[x1][y1].val;
@@ -590,21 +544,7 @@ int stdev(int x1, int y1, int x2, int y2, int row, int col, cell **arr, cell *tg
     sum_of_sq/=n;
     return (int)round(sqrt(sum_of_sq));
 }
-// int minimum(int x1, int y1, int x2, int y2, int row, int col, cell **arr)
-// {
-//     if (x1 >= row || x2 >= row || y1 >= col || y2 >= col)
-//     {
-//         return 0;
-//     }
-//     if (arr[x1][y1].val <= arr[x2][y2].val)
-//     {
-//         return arr[x1][y1].val;
-//     }
-//     else
-//     {
-//         return arr[x2][y2].val;
-//     }
-// }
+
 int max(int a, int b)
 {
     if (a >= b)
@@ -613,6 +553,7 @@ int max(int a, int b)
     }
     return b;
 }
+
 int min(int a, int b)
 {
     if (a <= b)
@@ -621,6 +562,7 @@ int min(int a, int b)
     }
     return b;
 }
+
 void col_convert(int col, char *str)
 {
     int i = 0;
@@ -641,6 +583,7 @@ void col_convert(int col, char *str)
     str[i] = '\0';
     rev(str);
 }
+
 // to display the 10*10 matrix
 void Display(int row, int col, cell **arr, int rowi, int coli)
 {
@@ -664,7 +607,6 @@ void Display(int row, int col, cell **arr, int rowi, int coli)
             }
             else
             {
-
                 printf("%d\t", arr[i][j].val);
             }
         }
@@ -705,38 +647,14 @@ coordinate convert_to_index(char *str)
         }
     }
     coordinate c = {return_index[0] - 1, return_index[1] - 1};
-    // printf("c.x:%d,c.y:%d\n", c.x, c.y);
     return c;
 }
 
-cell *create_new_cell()
-{
-    cell *new_cell = (cell *)malloc(sizeof(cell));
-    if (new_cell == NULL)
-    {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
-    new_cell->val = 0;
-    memset(&(new_cell->cmd), 0, sizeof(commandCall));
-    new_cell->dep = create_hashset();
-    return new_cell;
-}
-
-void free_cell(cell *c)
-{
-    free_hashset(c->dep);
-    free(c);
-}
-
+// Topological sort
 int topological_sort_util(int v, HashSet *visited, HashSet *stack, Node**sorted_cell, cell **arr)
 {  
     Node* sorted_cells = *sorted_cell;
-    if (contains(stack, v))
-    {
-        return 1;
-    }
-
+    if (contains(stack, v)){return 1;}
     if (!contains(visited, v))
     {
         insert(visited, v);
@@ -748,21 +666,15 @@ int topological_sort_util(int v, HashSet *visited, HashSet *stack, Node**sorted_
         { // Loop through all buckets
             Node *current = set->buckets[i];
             while (current)
-            { // Traverse the linked list in each bucket
-                // callback(current->value);  // Call the callback function with the string
+            { 
                 int x = topological_sort_util(current->value, visited, stack, &sorted_cells, arr);
-                if (x == 1)
-                {
-                    return 1;
-                }
+                if (x == 1) {return 1;}
                 current = current->next;
             }
         }
 
         remove_string(stack, v);
         Node *new_str = (Node *)malloc(sizeof(Node));
-        // strcpy(new_str, v);
-        // printf("v:%d\n",v);
         new_str->value=v;
         new_str->next=sorted_cells;
         sorted_cells=new_str;
@@ -773,60 +685,27 @@ int topological_sort_util(int v, HashSet *visited, HashSet *stack, Node**sorted_
 
 Node* topological_sort(int cell_name, cell **arr, int row, int col)
 {
-    // printf("cell_name:%d\n",cell_name);
     coordinate coord = decode_cell(cell_name);
     cell *start = &arr[coord.x][coord.y];
-
     int total_cells = row * col;
-
     HashSet *visited = create_hashset();
-
     HashSet *stack = create_hashset();
-
     Node *sorted_cells = NULL;
-
-    // if (sorted_cells == NULL)
-    // {
-    //     fprintf(stderr, "Memory allocation failed\n");
-    //     exit(EXIT_FAILURE);
-    // }
-    // int index = 0;
 
     int is_cycle = topological_sort_util(cell_name, visited, stack, &sorted_cells, arr);
     if (is_cycle == 1)
     {
-        // printf("Circular dependency\n");
         return NULL;
     }
-
-    // free(sorted_cells);
-    // if (debug)
-    //     printf("index:%d\n", index);
     free_hashset(visited);
     free_hashset(stack);
-
-    // for (int i = 0; i < index / 2; i++)
-    // {
-    //     char *temp = sorted_cells[i];
-    //     sorted_cells[i] = sorted_cells[index - i - 1];
-    //     sorted_cells[index - i - 1] = temp;
-    // }
-    // if (debug)
-    // {
-    //     printf("Sorted cells: ");
-    //     for (int i = 0; i < index; i++)
-    //     {
-    //         printf("%s\n", sorted_cells[i]);
-    //     }
-    // }
-    
     return sorted_cells;
 }
 
+// updates the cell
 void update(cell *tgt, cell **arr, int row, int col)
 {
     commandCall parsed_inp = tgt->cmd;
-    // printf("updated %d\n",parsed_inp.target);
     tgt->cmd.isDivByZero = 0;
     if (parsed_inp.type== 0)
     {
@@ -1031,6 +910,7 @@ void update(cell *tgt, cell **arr, int row, int col)
     }
 }
 
+// checks if the cell is valid
 int isSigned(char *inp)
 {
     char *pt = inp;
@@ -1054,13 +934,13 @@ int isSigned(char *inp)
     return 0;
 }
 
+// encode cell to integer
 int encode_cell(char* cell_str){
     coordinate c =convert_to_index(cell_str);
-    // printf("%d %d\n",c.x,c.y);
-    // printf("%d \n", c.x*(100000)+c.y);
     return c.x*(100000)+c.y;
 }
 
+// decode cell from integer
 coordinate decode_cell(int cellcode){
     coordinate c;
     c.x = cellcode/100000;
@@ -1068,6 +948,7 @@ coordinate decode_cell(int cellcode){
     return c;
 }
 
+// check if the range is valid
 int is_valid_range(char* cell1, char* cell2){
     coordinate c1 = convert_to_index(cell1);
     coordinate c2 = convert_to_index(cell2);
@@ -1077,6 +958,7 @@ int is_valid_range(char* cell1, char* cell2){
     return 1;
 }
 
+// remove whitespaces from string
 void remove_whitespace(char *str) {
     if(strncmp(temp, "scroll_to", 9) == 0){
         return;

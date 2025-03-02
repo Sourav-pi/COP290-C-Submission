@@ -5,6 +5,7 @@ CFLAGS = -IInclude -g
 SRCDIR = src
 INCDIR = Include
 OBJDIR = obj
+OPTDIR = target/release
 
 SOURCES = $(SRCDIR)/main.c $(SRCDIR)/module.c $(SRCDIR)/hash_set.c
 OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
@@ -12,6 +13,7 @@ TARGET = target/release/spreadsheet
 REPORT = ./report/report.tex
 
 $(TARGET): $(OBJECTS)
+	@mkdir -p $(OPTDIR)
 	echo $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
@@ -29,6 +31,7 @@ test:
 
 clean:
 	@rm -rf $(OBJDIR) $(TARGET) test
+	@rm -rf $(OPTDIR)
 	@rm -rf *.aux *.log *.out *.toc
 	@rm -rf *.pdf
 
