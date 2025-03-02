@@ -97,6 +97,7 @@ int isSigned(char* inp);
 int encode_cell(char* cell_str);
 coordinate decode_cell(int cellcode);
 void remove_whitespace(char *str);
+int getOp(char* inp);
 extern int rowmax ;
 extern int colmax ;
 
